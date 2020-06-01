@@ -1,17 +1,16 @@
+#include "driving_control/fws_driving.h"
 
-#include "driving_control/wheel_control.h"
-
-WheelControl::WheelControl(ros::NodeHandle & nh)
+FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
 : nh_(nh)
 {
 }
 
-WheelControl::~WheelControl()
+FourWheelSteeringDriving::~FourWheelSteeringDriving()
 {
 }
 
 /*!
- * \brief Creates and runs the wheel_control node.
+ * \brief Creates and runs the fws_driving node.
  *
  * \param argc argument count that is passed to ros::init
  * \param argv arguments that are passed to ros::init
@@ -20,12 +19,12 @@ WheelControl::~WheelControl()
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "wheel_control");
+    ros::init(argc, argv, "fws_driving");
     ros::NodeHandle nh("");
     ros::Rate rate(50);
 
     ROS_INFO("Find Rover Node initializing...");
-    WheelControl wheel_control(nh);
+    FourWheelSteeringDriving fws_driving(nh);
 
     while(ros::ok()) 
     {

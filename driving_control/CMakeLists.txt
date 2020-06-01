@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   message_generation
   message_runtime
-  navigation_msgs
   roscpp
   rospy
   std_msgs
@@ -71,10 +70,11 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   navigation_msgs#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -108,7 +108,7 @@ add_message_files(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES motion_control
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs 
 #  DEPENDS system_lib
 )
 
@@ -140,9 +140,9 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/driving_control_node.cpp)
 
-add_executable(4ws_driving src/4ws_driving.cpp)
-target_link_libraries(4ws_driving ${catkin_LIBRARIES})
-add_dependencies(4ws_driving driving_control_generate_messages_cpp)
+add_executable(fws_driving src/fws_driving.cpp)
+target_link_libraries(fws_driving ${catkin_LIBRARIES})
+add_dependencies(fws_driving driving_control_generate_messages_cpp)
 
 add_executable(wheel_control src/wheel_control.cpp)
 target_link_libraries(wheel_control ${catkin_LIBRARIES})
@@ -163,7 +163,7 @@ add_dependencies(wheel_control driving_control_generate_messages_cpp)
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries(4ws_driving
+target_link_libraries(fws_driving
   ${catkin_LIBRARIES}
 )
 
