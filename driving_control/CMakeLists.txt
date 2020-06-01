@@ -142,7 +142,7 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/driving_control_node.cpp)
 
 add_executable(fws_driving src/fws_driving.cpp)
-target_link_libraries(fws_driving ${catkin_LIBRARIES})
+target_link_libraries(fws_driving speed_limiter ${catkin_LIBRARIES})
 add_dependencies(fws_driving driving_control_generate_messages_cpp)
 
 add_executable(wheel_control src/wheel_control.cpp)
@@ -164,7 +164,7 @@ add_dependencies(wheel_control driving_control_generate_messages_cpp)
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries(fws_driving
+target_link_libraries(fws_driving speed_limiter 
   ${catkin_LIBRARIES}
 )
 

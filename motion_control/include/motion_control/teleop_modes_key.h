@@ -201,7 +201,7 @@ private:
   // Create oublishers
   ros::Publisher pubJointAngles;      /*!< Publisher of joint angles */
   ros::Publisher pubMotorEfforts;     /*!< Publisher of joint angles */
-  ros::Publisher pubSteeringEfforts;  /*!< Publisher of joint angles */
+  ros::Publisher pubSteeringAngles;  /*!< Publisher of joint angles */
   ros::Publisher pubSensorAngle;      /*!< Publisher of joint angles */
   ros::Publisher pubBinAngle;         /*!< Publisher of joint angles */
   ros::ServiceClient clientLights;         /*!< Publisher of joint angles */

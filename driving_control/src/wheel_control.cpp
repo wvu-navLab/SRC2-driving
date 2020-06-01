@@ -16,7 +16,7 @@ WheelControl::WheelControl(ros::NodeHandle & nh)
 : nh_(nh)
 {
     subJointStates = nh_.subscribe("joint_states", 1000, &WheelControl::jointStatesCallback, this);
-    subWheelVelCmds = nh_.subscribe("wheel_velocities", 1000, &WheelControl::wheelVelCmdsCallback, this);
+    subWheelVelCmds = nh_.subscribe("wheel_vel_cmds", 1000, &WheelControl::wheelVelCmdsCallback, this);
     pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
 }
 
@@ -37,7 +37,7 @@ void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &
     w3_current_ = msg->position[8];
     w4_current_ = msg->position[7];
   // ROS_INFO("Joint states updated.");
-  // ROS_INFO_STREAM("Values "<< q1_pos_<<" "<< q2_pos_<< " "<< q3_pos_<< " "<< q4_pos_);
+  // ROS_INFO_STREAM("Values "<< w1_current_<<" "<< w2_current_<< " "<< w3_current_<< " "<< w4_current_);
 }
 
 void WheelControl::controlMotors()
@@ -55,8 +55,8 @@ void WheelControl::controlMotors()
     m.m4 = m4;
 
     pubMotorEfforts.publish(m);
-  // ROS_INFO("Joint states updated.");
-  // ROS_INFO_STREAM("Values "<< q1_pos_<<" "<< q2_pos_<< " "<< q3_pos_<< " "<< q4_pos_);
+  // ROS_INFO("Motor efforts published.");
+  // ROS_INFO_STREAM("Values "<< m1<<" "<< m2<< " "<< m3<< " "<< m4);
 }
 
 /*!
