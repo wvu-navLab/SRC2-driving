@@ -6,6 +6,7 @@
  *
  * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@wvu.mix.edu
  * \author Chris Tatsch, WVU - ca0055@wvu.mix.edu
+ * \author Rogerio Lima, WVU - 	rrl00003@mix.wvu.edu
  * \date June 01, 2020
  */
 
@@ -18,10 +19,12 @@
 
 // ROS headers
 #include <ros/ros.h>
+#include <ros/console.h>
 
 // Custom message includes. Auto-generated from msg/ directory.
 #include <motion_control/MotorGroup.h>
-#include <driving_control/WheelVels.h>
+#include <driving_control/WheelVelCmds.h>
+#include <sensor_msgs/JointState.h>
 
 class WheelControl
 {
@@ -32,13 +35,29 @@ private:
     ros::Publisher pubMotorEfforts;
 
     // Subscriber
-    ros::Subscriber subWheelVels;
-    
+    ros::Subscriber subWheelVelCmds;
+    ros::Subscriber subJointStates;
+
+    // Callback function for subscribers.
+    void wheelVelCmdsCallback(const driving_control::WheelVelCmds::ConstPtr &msg);
+    void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
+
+    double w1_current_ = 0.0;
+    double w2_current_ = 0.0;
+    double w3_current_ = 0.0;
+    double w4_current_ = 0.0;
+ 
+    double w1_cmd_ = 0.0;
+    double w2_cmd_ = 0.0;
+    double w3_cmd_ = 0.0;
+    double w4_cmd_ = 0.0;
+
+    double Kp_ = 100;   
+
 public:
     WheelControl(ros::NodeHandle & nh);
 
-    // Callback function for subscriber.
-    void wheelVelsCallback(const motion_control::MotorGroup::ConstPtr &msg);
+    void controlMotors();
 };
 
 

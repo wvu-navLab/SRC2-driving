@@ -14,9 +14,6 @@
 FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
 : nh_(nh)
 {
-
-    subWheelVels = nh_.subscribe("wheel_velocities", 1000, &WheelControl::wheelVelsCallback, this);
-    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
 }
 
 /*!

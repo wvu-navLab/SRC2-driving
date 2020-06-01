@@ -16,11 +16,11 @@ TeleopModesKey::TeleopModesKey(ros::NodeHandle & nh)
 : nh_(nh)
 {
   // Node publishes the messages in appropriate topics
-  pubJointAngles = nh_.advertise<motion_control::JointGroup>("jointAngles", 1000);
-  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motorEfforts", 1000);
-  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("steeringEfforts", 1000);
-  pubSensorAngle = nh_.advertise<motion_control::SensorJoint>("sensorAngle", 1000);
-  pubBinAngle = nh_.advertise<motion_control::BinJoint>("binAngle", 1000);
+  pubJointAngles = nh_.advertise<motion_control::JointGroup>("arm_joint_angles", 1000);
+  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
+  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("steering_joint_angles", 1000);
+  pubSensorAngle = nh_.advertise<motion_control::SensorJoint>("sensor_joint_angle", 1000);
+  pubBinAngle = nh_.advertise<motion_control::BinJoint>("bin_joint_angle", 1000);
   clientLights = nh_.serviceClient<srcp2_msgs::ToggleLightSrv>("/toggle_light");
 
   // initialize driving mode

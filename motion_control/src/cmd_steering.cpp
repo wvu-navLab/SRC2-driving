@@ -10,7 +10,7 @@ SteeringCommander::SteeringCommander(ros::NodeHandle & nh)
 {    
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("steeringEfforts", 1000, &SteeringCommander::messageCallback, this);
+  sub_ = nh_.subscribe("steering_joint_angles", 1000, &SteeringCommander::messageCallback, this);
 
   // Node publishes individual joint positions
   pub1_ = nh_.advertise<std_msgs::Float64>("fr_steering_arm_controller/command", 1000);
