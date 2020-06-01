@@ -1,0 +1,161 @@
+/*!
+ * \driving_tools.cpp
+ * \brief Driving Tools for SRC2 Rovers
+ *
+ * Manipulation creates a ROS node that ...
+ *
+ * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@wvu.mix.edu
+ * \date May 04, 2020
+ */
+
+#include <driving_tools/driving_tools.h>
+
+DrivingTools::DrivingTools()
+{
+  // Publishers
+  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("/motorEfforts", 1000);
+  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("/steeringEfforts", 1000);
+
+  // Service Servers
+  stopServer = nh_.advertiseService("stop", &DrivingTools::Stop, this);
+  rotateInPlaceServer = nh_.advertiseService("rotate_in_place", &DrivingTools::RotateInPlace, this);
+  circBaseStationServer = nh_.advertiseService("circ_base_station", &DrivingTools::CirculateBaseStation, this);
+  moveForwardServer = nh_.advertiseService("move_forward", &DrivingTools::MoveForward, this);
+}
+
+bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, driving_tools::RotateInPlace::Response &res)
+{
+  ROS_INFO("Rotate-in-Place Service requested.");
+  // Rotate wheels at 45 deg
+  s1 = MAX_STEERING_ANGLE/2;
+  s2 = -MAX_STEERING_ANGLE/2;
+  s3 = -MAX_STEERING_ANGLE/2;
+  s4 = MAX_STEERING_ANGLE/2;
+  s.s1 = s1;
+  s.s2 = s2;
+  s.s3 = s3;
+  s.s4 = s4;
+
+  double throttle = req.throttle;
+  // Grab the directional data
+  m1 = - throttle * MAX_MOTOR_EFFORT;
+  m2 = - throttle * MAX_MOTOR_EFFORT;
+  m3 = throttle * MAX_MOTOR_EFFORT;
+  m4 = throttle * MAX_MOTOR_EFFORT;
+
+  m.m1 = m1;
+  m.m2 = m2;
+  m.m3 = m3;
+  m.m4 = m4;
+
+  pubMotorEfforts.publish(m);
+  pubSteeringEfforts.publish(s);
+
+  res.success = 0;
+  return true;
+}
+
+bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Request  &req, driving_tools::CirculateBaseStation::Response &res)
+{
+  ROS_INFO("Circulate Base Station Service requested.");
+  double R = req.radius;
+  double alpha_i = atan2(SEMI_CHASSIS_LENGTH,R-SEMI_CHASSIS_WIDTH);
+  double alpha_o = atan2(SEMI_CHASSIS_LENGTH,R+SEMI_CHASSIS_WIDTH);
+  // Rotate wheels at 45 deg
+  s1 = alpha_o;
+  s2 = -alpha_o;
+  s3 = alpha_i;
+  s4 = -alpha_i;
+
+  s.s1 = s1;
+  s.s2 = s2;
+  s.s3 = s3;
+  s.s4 = s4;
+
+  double throttle = req.throttle;
+  // Grab the directional data
+  m1 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_WIDTH)/R;
+  m2 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_WIDTH)/R;
+  m3 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_WIDTH)/R;
+  m4 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_WIDTH)/R;
+
+  m.m1 = m1;
+  m.m2 = m2;
+  m.m3 = m3;
+  m.m4 = m4;
+
+  pubMotorEfforts.publish(m);
+  pubSteeringEfforts.publish(s);
+
+  res.success = 0;
+  return true;
+}
+
+bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, driving_tools::MoveForward::Response &res)
+{
+  ROS_INFO("Move Forward Service requested.");
+  // Rotate wheels at 45 deg
+  s1 = 0;
+  s2 = 0;
+  s3 = 0;
+  s4 = 0;
+
+  s.s1 = s1;
+  s.s2 = s2;
+  s.s3 = s3;
+  s.s4 = s4;
+
+  double throttle = req.throttle;
+  // Grab the directional data
+  m1 = throttle * MAX_MOTOR_EFFORT;
+  m2 = throttle * MAX_MOTOR_EFFORT;
+  m3 = throttle * MAX_MOTOR_EFFORT;
+  m4 = throttle * MAX_MOTOR_EFFORT;
+
+  m.m1 = m1;
+  m.m2 = m2;
+  m.m3 = m3;
+  m.m4 = m4;
+
+  pubMotorEfforts.publish(m);
+  pubSteeringEfforts.publish(s);
+
+  res.success = true;
+  return true;
+}
+
+bool DrivingTools::Stop(driving_tools::Stop::Request  &req, driving_tools::Stop::Response &res)
+{
+  if (req.enableStop)
+  {
+    ROS_INFO("Stop Service request received.");
+
+    s.s1 = 0;
+    s.s2 = 0;
+    s.s3 = 0;
+    s.s4 = 0;
+
+    m.m1 = 0;
+    m.m2 = 0;
+    m.m3 = 0;
+    m.m4 = 0;
+
+    pubMotorEfforts.publish(m);
+    pubSteeringEfforts.publish(s);
+
+    res.success = true;
+  }
+  return true;
+}
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "driving_tools");
+
+  DrivingTools driving_tools;
+  ROS_INFO("Ready to activate driving modes.");
+  
+  ros::spin();
+
+  return 0;
+}
