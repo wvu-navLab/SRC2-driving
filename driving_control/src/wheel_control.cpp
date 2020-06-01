@@ -1,13 +1,27 @@
+/*!
+ * \wheel_control.cpp
+ * \brief wheel_control (...).
+ *
+ * Wheel control (...).
+ *
+ * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@wvu.mix.edu
+ * \author Chris Tatsch, WVU - ca0055@wvu.mix.edu
+ * \date June 01, 2020
+ */
 
 #include "driving_control/wheel_control.h"
 
 WheelControl::WheelControl(ros::NodeHandle & nh)
 : nh_(nh)
 {
+    subJointStates = nh_.subscribe("joint_states", 1000, &WheelControl::jointStatesCallback, this);
+    subWheelVels = nh_.subscribe("wheel_velocities", 1000, &WheelControl::wheelVelsCallback, this);
+    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
 }
 
-WheelControl::~WheelControl()
+void WheelControl::wheelVelsCallback(const motion_control::MotorGroup::ConstPtr &msg)
 {
+    ROS_INFO_STREAM("Message: " << msg);
 }
 
 /*!

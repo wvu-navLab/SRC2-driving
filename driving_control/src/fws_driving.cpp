@@ -1,12 +1,22 @@
+/*!
+ * \fws_driving.cpp
+ * \brief 4ws_driving (...).
+ *
+ * Four wheel steering driving (...).
+ *
+ * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@wvu.mix.edu
+ * \author Chris Tatsch, WVU - ca0055@wvu.mix.edu
+ * \date June 01, 2020
+ */
+
 #include "driving_control/fws_driving.h"
 
 FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
 : nh_(nh)
 {
-}
 
-FourWheelSteeringDriving::~FourWheelSteeringDriving()
-{
+    subWheelVels = nh_.subscribe("wheel_velocities", 1000, &WheelControl::wheelVelsCallback, this);
+    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
 }
 
 /*!

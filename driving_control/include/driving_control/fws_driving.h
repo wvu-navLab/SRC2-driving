@@ -1,5 +1,5 @@
 /*!
- * \4ws_driving.h
+ * \fws_driving.h
  * \brief 4ws_driving (...).
  *
  * Four wheel steering driving (...).
@@ -9,12 +9,12 @@
  * \date June 01, 2020
  */
 
-#ifndef FWS_DRIVING_H_
-#define FWS_DRIVING_H_
-
+#ifndef FWS_DRIVING_H
+#define FWS_DRIVING_H
 
 // Include cpp important headers
-
+#include <math.h>
+#include <stdio.h> 
 
 // ROS headers
 #include <ros/ros.h>
@@ -27,8 +27,7 @@ private:
     
 public:
     FourWheelSteeringDriving(ros::NodeHandle & nh);
-    ~FourWheelSteeringDriving();
 };
 
 
-#endif // FWS_DRIVING_H_
+#endif // FWS_DRIVING_H
