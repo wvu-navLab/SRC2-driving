@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(motion_control)
+cmake_minimum_required(VERSION 3.0.2)
+project(driving_control)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,10 +8,13 @@ project(motion_control)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
   geometry_msgs
   message_generation
+  message_runtime
+  navigation_msgs
+  roscpp
+  rospy
+  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -50,11 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  JointGroup.msg
-  MotorGroup.msg
-  SteeringGroup.msg
-  SensorJoint.msg
-  BinJoint.msg
+  WheelVels.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -72,11 +71,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   geometry_msgs#   navigation_msgs#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -126,9 +124,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/motion_control.cpp
+#   src/${PROJECT_NAME}/driving_control.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -139,30 +138,15 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+# add_executable(${PROJECT_NAME}_node src/driving_control_node.cpp)
 
-add_executable(cmd_joints src/cmd_joints.cpp)
-target_link_libraries(cmd_joints ${catkin_LIBRARIES})
-add_dependencies(cmd_joints motion_control_generate_messages_cpp)
+add_executable(4ws_driving src/4ws_driving.cpp)
+target_link_libraries(4ws_driving ${catkin_LIBRARIES})
+add_dependencies(4ws_driving driving_control_generate_messages_cpp)
 
-add_executable(cmd_sensor src/cmd_sensor.cpp)
-target_link_libraries(cmd_sensor ${catkin_LIBRARIES})
-add_dependencies(cmd_sensor motion_control_generate_messages_cpp)
-
-add_executable(cmd_bin src/cmd_bin.cpp)
-target_link_libraries(cmd_bin ${catkin_LIBRARIES})
-add_dependencies(cmd_bin motion_control_generate_messages_cpp)
-
-add_executable(cmd_motors src/cmd_motors.cpp)
-target_link_libraries(cmd_motors ${catkin_LIBRARIES})
-add_dependencies(cmd_motors motion_control_generate_messages_cpp)
-
-add_executable(cmd_steering src/cmd_steering.cpp)
-target_link_libraries(cmd_steering ${catkin_LIBRARIES})
-add_dependencies(cmd_steering motion_control_generate_messages_cpp)
-
-add_executable(teleop_modes_key src/teleop_modes_key.cpp)
-target_link_libraries(teleop_modes_key ${catkin_LIBRARIES})
-add_dependencies(teleop_modes_key motion_control_generate_messages_cpp)
+add_executable(wheel_control src/wheel_control.cpp)
+target_link_libraries(wheel_control ${catkin_LIBRARIES})
+add_dependencies(wheel_control driving_control_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -175,29 +159,18 @@ add_dependencies(teleop_modes_key motion_control_generate_messages_cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(cmd_sensor
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
+
+target_link_libraries(4ws_driving
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(cmd_bin
+target_link_libraries(wheel_control
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(cmd_joints
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(cmd_motors
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(cmd_steering
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(teleop_modes_key
-  ${catkin_LIBRARIES}
-)
 #############
 ## Install ##
 #############
@@ -207,7 +180,7 @@ target_link_libraries(teleop_modes_key
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
+# catkin_install_python(PROGRAMS
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
@@ -245,7 +218,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_motion_control.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_driving_control.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
