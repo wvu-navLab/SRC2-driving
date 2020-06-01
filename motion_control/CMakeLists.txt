@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   message_generation
+  srcp2_msgs
 )
 
 ## System dependencies are found with CMake's conventions
