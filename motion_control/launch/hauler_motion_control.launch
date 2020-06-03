@@ -44,14 +44,6 @@
 	<remap from="br_steering_arm_controller/command" to="$(arg robot_namespace)/br_steering_arm_controller/command"/>
     	<remap from="fl_steering_arm_controller/command" to="$(arg robot_namespace)/fl_steering_arm_controller/command"/>
 	<remap from="bl_steering_arm_controller/command" to="$(arg robot_namespace)/bl_steering_arm_controller/command"/>
-        
-	<remap from="/toggle_light" to="$(arg robot_namespace)/toggle_light"/>  
-  <node name="teleop_modes_key" 
-	pkg="motion_control" 
-	type="teleop_modes_key"
-	respawn="false" 
-	output="screen" 
-	ns="$(arg robot_namespace)"/>
 
 </launch>
 

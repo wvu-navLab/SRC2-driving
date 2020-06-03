@@ -1,0 +1,16 @@
+<launch>
+<arg name="robot_namespace" default="/excavator_1"/>
+        
+	<remap from="/toggle_light" to="$(arg robot_namespace)/toggle_light"/>
+  <node name="teleop_modes_key" 
+	pkg="teleop_modes" 
+	type="teleop_modes_key"
+	respawn="false" 
+	output="screen" 
+	ns="$(arg robot_namespace)"/>
+
+</launch>
+
+
+
+

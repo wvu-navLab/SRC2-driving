@@ -10,7 +10,7 @@
  * * \date March 28, 2020
  */
 
-#include <motion_control/teleop_modes_key.h>
+#include <teleop_modes/teleop_modes_key.h>
 
 TeleopModesKey::TeleopModesKey(ros::NodeHandle & nh)
 : nh_(nh)

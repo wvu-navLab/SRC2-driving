@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(motion_control)
+project(teleop_modes)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   geometry_msgs
+  motion_control
   message_generation
   srcp2_msgs
 )
@@ -49,14 +50,14 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  JointGroup.msg
-  MotorGroup.msg
-  SteeringGroup.msg
-  SensorJoint.msg
-  BinJoint.msg
-)
+# add_message_files(
+#   FILES
+#   JointGroup.msg
+#   MotorGroup.msg
+#   SteeringGroup.msg
+#   SensorJoint.msg
+#   BinJoint.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -77,6 +78,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   geometry_msgs
+  motion_control
 )
 
 ################################################
@@ -110,7 +112,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES motion_control
+  LIBRARIES motion_control
   CATKIN_DEPENDS message_runtime std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
@@ -141,25 +143,9 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-add_executable(cmd_joints src/cmd_joints.cpp)
-target_link_libraries(cmd_joints ${catkin_LIBRARIES})
-add_dependencies(cmd_joints motion_control_generate_messages_cpp)
-
-add_executable(cmd_sensor src/cmd_sensor.cpp)
-target_link_libraries(cmd_sensor ${catkin_LIBRARIES})
-add_dependencies(cmd_sensor motion_control_generate_messages_cpp)
-
-add_executable(cmd_bin src/cmd_bin.cpp)
-target_link_libraries(cmd_bin ${catkin_LIBRARIES})
-add_dependencies(cmd_bin motion_control_generate_messages_cpp)
-
-add_executable(cmd_motors src/cmd_motors.cpp)
-target_link_libraries(cmd_motors ${catkin_LIBRARIES})
-add_dependencies(cmd_motors motion_control_generate_messages_cpp)
-
-add_executable(cmd_steering src/cmd_steering.cpp)
-target_link_libraries(cmd_steering ${catkin_LIBRARIES})
-add_dependencies(cmd_steering motion_control_generate_messages_cpp)
+add_executable(teleop_modes_key src/teleop_modes_key.cpp)
+target_link_libraries(teleop_modes_key ${catkin_LIBRARIES})
+add_dependencies(teleop_modes_key teleop_modes_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -172,26 +158,10 @@ add_dependencies(cmd_steering motion_control_generate_messages_cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(cmd_sensor
+
+target_link_libraries(teleop_modes_key
   ${catkin_LIBRARIES}
 )
-
-target_link_libraries(cmd_bin
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(cmd_joints
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(cmd_motors
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(cmd_steering
-  ${catkin_LIBRARIES}
-)
-
 #############
 ## Install ##
 #############
