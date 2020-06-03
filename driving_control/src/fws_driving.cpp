@@ -30,6 +30,12 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     nh_.getParam("/wheel_separation_length", wheel_separation_length_);
     nh_.getParam("/wheel_separation_width", wheel_separation_width_);
 
+    ROS_INFO_STREAM("joint_state_controller/publish_rate" << joint_state_controller_publish_rate_);
+    ROS_INFO_STREAM("/max_velocity" << max_velocity_);
+    ROS_INFO_STREAM("/wheel_radius" << wheel_radius_);
+    ROS_INFO_STREAM("/wheel_separation_length" << wheel_separation_length_);
+    ROS_INFO_STREAM("/wheel_separation_width" << wheel_separation_width_);
+
     clientStop = nh_.serviceClient<driving_tools::Stop>("stop");
 
     // Subscriber
@@ -43,6 +49,8 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
 
 void FourWheelSteeringDriving::update(const ros::Time& time, const ros::Duration& period)
 {
+
+    ROS_INFO("I got here 1");
     updateCommand(time, period);
 }
 
@@ -108,6 +116,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     double front_left_steering = 0, front_right_steering = 0;
     double rear_left_steering = 0, rear_right_steering = 0;
 
+
     if(enable_twist_cmd_ == true)
     {
     //   // Limit velocities and accelerations:
@@ -116,59 +125,62 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     //   last1_cmd_ = last0_cmd_;
     //   last0_cmd_ = curr_cmd_twist;
 
-      // Compute wheels velocities:
-      if(fabs(curr_cmd_twist.lin_x) > 0.001)
-      {
-        const double vel_steering_offset = (curr_cmd_twist.ang*wheel_steering_y_offset_)/wheel_radius_;
-        const double sign = copysign(1.0, curr_cmd_twist.lin_x);
-        vel_left_front  = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
+        ROS_INFO("I got here (calc loop)");
+        // Compute wheels velocities:
+        if(fabs(curr_cmd_twist.lin_x) > 0.001)
+        {
+            const double vel_steering_offset = (curr_cmd_twist.ang*wheel_steering_y_offset_)/wheel_radius_;
+            const double sign = copysign(1.0, curr_cmd_twist.lin_x);
+            vel_left_front  = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
+                                                (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
+                            - vel_steering_offset;
+            vel_right_front = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
+                                                (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
+                            + vel_steering_offset;
+            vel_left_rear = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
                                             (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                          - vel_steering_offset;
-        vel_right_front = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
+                            - vel_steering_offset;
+            vel_right_rear = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
                                             (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                          + vel_steering_offset;
-        vel_left_rear = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
-                                          (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                        - vel_steering_offset;
-        vel_right_rear = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
-                                           (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                         + vel_steering_offset;
-      }
+                            + vel_steering_offset;
+        }
 
-      // Compute steering angles
-      if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
-      {
-        front_left_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
-                                    (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
-        front_right_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
-                                     (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
-      }
-      else if(fabs(curr_cmd_twist.lin_x) > 0.001)
-      {
-        front_left_steering = copysign(M_PI_2, curr_cmd_twist.ang);
-        front_right_steering = copysign(M_PI_2, curr_cmd_twist.ang);
-      }
-      rear_left_steering = -front_left_steering;
-      rear_right_steering = -front_right_steering;
+        // Compute steering angles
+        if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
+        {
+            front_left_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
+                                        (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
+            front_right_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
+                                        (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
+        }
+        else if(fabs(curr_cmd_twist.lin_x) > 0.001)
+        {
+            front_left_steering = copysign(M_PI_2, curr_cmd_twist.ang);
+            front_right_steering = copysign(M_PI_2, curr_cmd_twist.ang);
+        }
+        rear_left_steering = -front_left_steering;
+        rear_right_steering = -front_right_steering;
     }
-
-    ROS_DEBUG_STREAM_THROTTLE(1, "vel_left_rear "<<vel_left_rear<<" front_right_steering "<<front_right_steering);
 
     // Set wheels velocities:
     driving_control::WheelVelCmds w;
-    w.w1 = vel_left_front;
-    w.w2 = vel_right_front;
-    w.w3 = vel_left_rear;
-    w.w4 = vel_right_rear;
+    w.w1 = vel_right_front; //fr_wheel_joint
+    w.w2 = vel_right_rear; //br_wheel_joint
+    w.w3 = vel_left_front; //fl_wheel_joint
+    w.w4 = vel_left_rear; //bl_wheel_joint
     pubWheelVelCmds.publish(w);
+
+    ROS_INFO_STREAM("Wheel velocities commanded" << w);
 
     /// TODO check limits to not apply the same steering on right and left when saturated !
     motion_control::SteeringGroup s;
-    s.s1 = front_left_steering;
-    s.s2 = front_right_steering;
-    s.s3 = rear_left_steering;
-    s.s4 = rear_right_steering;
+    s.s1 = front_right_steering; //fr_steering_joint
+    s.s2 = rear_right_steering; //br_steering_joint
+    s.s3 = front_left_steering; //fl_steering_joint
+    s.s4 = rear_left_steering; //bl_steering_joint
     pubSteeringAngles.publish(s);
+
+    ROS_INFO_STREAM("Steering angles commanded" << s);
 }
 
 /*!
@@ -189,47 +201,17 @@ int main(int argc, char **argv)
     FourWheelSteeringDriving fws_driving(nh);
 
     ROS_WARN_STREAM("Period: " << fws_driving.getPeriod().toSec());
-    
-    ros::Publisher clock_publisher = nh.advertise<rosgraph_msgs::Clock>("/clock", 1);
-
-    ros::AsyncSpinner spinner(1);
-    spinner.start();
-
-    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
-    std::chrono::system_clock::time_point end   = std::chrono::system_clock::now();
 
     ros::Time internal_time(0);
     const ros::Duration dt = fws_driving.getPeriod();
-    double elapsed_secs = 0;
 
     while(ros::ok()) 
     {
-        begin = std::chrono::system_clock::now();
-
         fws_driving.update(internal_time, dt);
-
-        end = std::chrono::system_clock::now();
-
-        elapsed_secs = std::chrono::duration_cast<std::chrono::duration<double> >((end - begin)).count();
-
-        if (dt.toSec() - elapsed_secs < 0.0)
-        {
-        ROS_WARN_STREAM_THROTTLE(
-                0.1, "Control cycle is taking to much time, elapsed: " << elapsed_secs);
-        }
-        else
-        {
-            ROS_DEBUG_STREAM_THROTTLE(1.0, "Control cycle is, elapsed: " << elapsed_secs);
-            std::this_thread::sleep_for(std::chrono::duration<double>(dt.toSec() - elapsed_secs));
-        }
-
-        rosgraph_msgs::Clock clock;
-        clock.clock = ros::Time(internal_time);
-        clock_publisher.publish(clock);
         internal_time += dt;
+        ros::spinOnce();
+        rate.sleep();
     }
-
-    spinner.stop();
 
     return 0;
 }

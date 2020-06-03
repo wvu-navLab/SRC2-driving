@@ -7,11 +7,11 @@
           output="screen">
     </node>
 
-    <!-- <node pkg="driving_control"
+    <node pkg="driving_control"
           name="fws_driving"
           type="fws_driving"
           output="screen">
-    </node> -->
+    </node>
   </group>
 
 </launch>

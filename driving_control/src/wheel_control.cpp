@@ -26,8 +26,8 @@ void WheelControl::wheelVelCmdsCallback(const driving_control::WheelVelCmds::Con
     w2_cmd_ = msg->w2;
     w3_cmd_ = msg->w3;
     w4_cmd_ = msg->w4;
-    ROS_INFO("Joint commands updated.");
-    ROS_INFO_STREAM("Values "<< w1_cmd_<<" "<< w2_cmd_<< " "<< w3_cmd_<< " "<< w4_cmd_);
+    // ROS_INFO("Joint commands updated.");
+    // ROS_INFO_STREAM("Values "<< w1_cmd_<<" "<< w2_cmd_<< " "<< w3_cmd_<< " "<< w4_cmd_);
 }
 
 void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
@@ -37,8 +37,8 @@ void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &
     w3_current_ = msg->velocity[11]; //fl_wheel_joint
     w4_current_ = msg->velocity[3]; //bl_wheel_joint
 
-    ROS_INFO("Joint states updated.");
-    ROS_INFO_STREAM("Values "<< w1_current_<<" "<< w2_current_<< " "<< w3_current_<< " "<< w4_current_);
+    // ROS_INFO("Joint states updated.");
+    // ROS_INFO_STREAM("Values "<< w1_current_<<" "<< w2_current_<< " "<< w3_current_<< " "<< w4_current_);
 }
 
 void WheelControl::controlMotors()
@@ -56,8 +56,8 @@ void WheelControl::controlMotors()
     m.m4 = m4;
 
     pubMotorEfforts.publish(m);
-    ROS_INFO("Motor efforts published.");
-    ROS_INFO_STREAM("Values "<< m1<<" "<< m2<< " "<< m3<< " "<< m4);
+    // ROS_INFO("Motor efforts published.");
+    // ROS_INFO_STREAM("Values "<< m1<<" "<< m2<< " "<< m3<< " "<< m4);
 }
 
 /*!
