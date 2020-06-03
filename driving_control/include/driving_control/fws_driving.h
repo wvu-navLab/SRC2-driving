@@ -15,6 +15,8 @@
 // Include cpp important headers
 #include <math.h>
 #include <stdio.h> 
+#include <chrono>
+#include <thread>
 
 // ROS headers
 #include <ros/ros.h>
@@ -27,8 +29,10 @@
 #include <motion_control/SteeringGroup.h>
 #include <driving_control/WheelVelCmds.h>
 #include <driving_tools/Stop.h>
+#include <rosgraph_msgs/Clock.h>
 
-#include <driving_control/speed_limiter.h>
+
+// #include <driving_control/speed_limiter.h>
 
 class FourWheelSteeringDriving
 {
@@ -46,7 +50,10 @@ public:
     void brake();
 
     void cmdVelCallback(const geometry_msgs::Twist& command);
-    
+
+    ros::Time getTime() const {return ros::Time::now();}
+    ros::Duration getPeriod() const {return ros::Duration(0.01);}
+
 private:
     // Node Handle
     ros::NodeHandle & nh_;
@@ -107,11 +114,11 @@ private:
     double joint_state_controller_publish_rate_;
     double max_velocity_;
 
-    /// Speed limiters:
-    CommandTwist last1_cmd_;
-    CommandTwist last0_cmd_;
-    SpeedLimiter limiter_lin_;
-    SpeedLimiter limiter_ang_;
+    // /// Speed limiters:
+    // CommandTwist last1_cmd_;
+    // CommandTwist last0_cmd_;
+    // SpeedLimiter limiter_lin_;
+    // SpeedLimiter limiter_ang_;
 };
 
 

@@ -110,11 +110,11 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
 
     if(enable_twist_cmd_ == true)
     {
-      // Limit velocities and accelerations:
-      limiter_lin_.limit(curr_cmd_twist.lin_x, last0_cmd_.lin_x, last1_cmd_.lin_x, cmd_dt);
-      limiter_ang_.limit(curr_cmd_twist.ang, last0_cmd_.ang, last1_cmd_.ang, cmd_dt);
-      last1_cmd_ = last0_cmd_;
-      last0_cmd_ = curr_cmd_twist;
+    //   // Limit velocities and accelerations:
+    //   limiter_lin_.limit(curr_cmd_twist.lin_x, last0_cmd_.lin_x, last1_cmd_.lin_x, cmd_dt);
+    //   limiter_ang_.limit(curr_cmd_twist.ang, last0_cmd_.ang, last1_cmd_.ang, cmd_dt);
+    //   last1_cmd_ = last0_cmd_;
+    //   last0_cmd_ = curr_cmd_twist;
 
       // Compute wheels velocities:
       if(fabs(curr_cmd_twist.lin_x) > 0.001)
@@ -185,13 +185,51 @@ int main(int argc, char **argv)
     ros::NodeHandle nh("");
     ros::Rate rate(50);
 
-    ROS_INFO("Find Rover Node initializing...");
+    ROS_INFO("Four Wheel Steering Driving Node initializing...");
     FourWheelSteeringDriving fws_driving(nh);
+
+    ROS_WARN_STREAM("Period: " << fws_driving.getPeriod().toSec());
+    
+    ros::Publisher clock_publisher = nh.advertise<rosgraph_msgs::Clock>("/clock", 1);
+
+    ros::AsyncSpinner spinner(1);
+    spinner.start();
+
+    std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point end   = std::chrono::system_clock::now();
+
+    ros::Time internal_time(0);
+    const ros::Duration dt = fws_driving.getPeriod();
+    double elapsed_secs = 0;
 
     while(ros::ok()) 
     {
-        ros::spinOnce();
-        rate.sleep();
+        begin = std::chrono::system_clock::now();
+
+        fws_driving.update(internal_time, dt);
+
+        end = std::chrono::system_clock::now();
+
+        elapsed_secs = std::chrono::duration_cast<std::chrono::duration<double> >((end - begin)).count();
+
+        if (dt.toSec() - elapsed_secs < 0.0)
+        {
+        ROS_WARN_STREAM_THROTTLE(
+                0.1, "Control cycle is taking to much time, elapsed: " << elapsed_secs);
+        }
+        else
+        {
+            ROS_DEBUG_STREAM_THROTTLE(1.0, "Control cycle is, elapsed: " << elapsed_secs);
+            std::this_thread::sleep_for(std::chrono::duration<double>(dt.toSec() - elapsed_secs));
+        }
+
+        rosgraph_msgs::Clock clock;
+        clock.clock = ros::Time(internal_time);
+        clock_publisher.publish(clock);
+        internal_time += dt;
     }
+
+    spinner.stop();
+
     return 0;
 }

@@ -1,0 +1,17 @@
+<launch> 
+
+  <group ns="excavator_1">
+    <node pkg="driving_control"
+          name="wheel_control"
+          type="wheel_control"
+          output="screen">
+    </node>
+
+    <!-- <node pkg="driving_control"
+          name="fws_driving"
+          type="fws_driving"
+          output="screen">
+    </node> -->
+  </group>
+
+</launch>
