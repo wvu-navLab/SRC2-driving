@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   message_generation
   motion_control
+  srcp2_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -122,8 +123,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
- include
-  ../../../install/include
+  include  
+  ~/srcp2-competitors/ros_workspace/install/include
   ${catkin_INCLUDE_DIRS}
 )
 
