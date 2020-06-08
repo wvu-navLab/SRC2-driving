@@ -7,7 +7,7 @@ Provides services for driving a robot blindly
 1. Use the launch file. Round 1 and 3, `{rover_type}` is `scout`. For round 2 `{rover_type}` is either `excavator` or `hauler`.
 
 ```
-cd ~/catkin_ws/
+cd ~/srcp2-competitors/ros_workspace/
 source devel/setup.bash
 roslaunch driving_tools {rover_type}_driving_tools
 ```

@@ -6,7 +6,7 @@
 1. Use the launch file. Round 1 and 3, `{rover_type}` is `scout`. For round 2 `{rover_type}` is either `excavator` or `hauler`.
 
 ```
-cd ~/catkin_ws/
+cd ~/srcp2-competitors/ros_workspace/
 source devel/setup.bash
 roslaunch motion_control {rover_type}_motion_control
 ```

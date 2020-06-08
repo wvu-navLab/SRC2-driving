@@ -15,7 +15,6 @@
 // Include cpp important headers
 #include <math.h>
 #include <stdio.h> 
-#include <chrono>
 #include <thread>
 
 // ROS headers
@@ -41,18 +40,13 @@ public:
 
     void starting(const ros::Time& time);
     
-    void stopping(const ros::Time& /*time*/);
-
-    void update(const ros::Time& time, const ros::Duration& period);
+    void stopping(const ros::Time& time);
 
     void updateCommand(const ros::Time& time, const ros::Duration& period);
 
     void brake();
 
     void cmdVelCallback(const geometry_msgs::Twist& command);
-
-    ros::Time getTime() const {return ros::Time::now();}
-    ros::Duration getPeriod() const {return ros::Duration(0.01);}
 
 private:
     // Node Handle

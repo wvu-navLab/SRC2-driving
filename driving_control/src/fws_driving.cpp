@@ -46,27 +46,20 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("steering_joint_angles", 1000);
 }
 
-
-void FourWheelSteeringDriving::update(const ros::Time& time, const ros::Duration& period)
-{
-
-    ROS_INFO("I got here 1");
-    updateCommand(time, period);
-}
-
 void FourWheelSteeringDriving::starting(const ros::Time& time)
 {
+    ROS_INFO("Starting.");
     brake();
 }
 
-void FourWheelSteeringDriving::stopping(const ros::Time& /*time*/)
-{
+void FourWheelSteeringDriving::stopping(const ros::Time& time)
+{    
+    ROS_INFO("Stopping.");
     brake();
 }
 
 void FourWheelSteeringDriving::brake()
 {
-    ROS_INFO("Stopping.");
     driving_tools::Stop srv;
     srv.request.enableStop = true;
     bool success = clientStop.call(srv);
@@ -125,7 +118,6 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     //   last1_cmd_ = last0_cmd_;
     //   last0_cmd_ = curr_cmd_twist;
 
-        ROS_INFO("I got here (calc loop)");
         // Compute wheels velocities:
         if(fabs(curr_cmd_twist.lin_x) > 0.001)
         {
@@ -170,7 +162,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     w.w4 = vel_left_rear; //bl_wheel_joint
     pubWheelVelCmds.publish(w);
 
-    ROS_INFO_STREAM("Wheel velocities commanded" << w);
+    // ROS_INFO_STREAM("Wheel velocities commanded" << w);
 
     /// TODO check limits to not apply the same steering on right and left when saturated !
     motion_control::SteeringGroup s;
@@ -180,7 +172,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     s.s4 = rear_left_steering; //bl_steering_joint
     pubSteeringAngles.publish(s);
 
-    ROS_INFO_STREAM("Steering angles commanded" << s);
+    // ROS_INFO_STREAM("Steering angles commanded" << s);
 }
 
 /*!
@@ -200,18 +192,23 @@ int main(int argc, char **argv)
     ROS_INFO("Four Wheel Steering Driving Node initializing...");
     FourWheelSteeringDriving fws_driving(nh);
 
-    ROS_WARN_STREAM("Period: " << fws_driving.getPeriod().toSec());
 
-    ros::Time internal_time(0);
-    const ros::Duration dt = fws_driving.getPeriod();
+    ros::Time internal_time(0.01);
+    const ros::Duration dt(0.01);
+
+    ROS_WARN_STREAM("Period: " << dt.toSec());
+
+    // fws_driving.starting(internal_time);
 
     while(ros::ok()) 
     {
-        fws_driving.update(internal_time, dt);
+        fws_driving.updateCommand(internal_time, dt);
         internal_time += dt;
         ros::spinOnce();
         rate.sleep();
     }
+
+    fws_driving.stopping(internal_time);
 
     return 0;
 }
