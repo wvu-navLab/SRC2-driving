@@ -7,7 +7,7 @@
 ```
 cd ~/catkin_ws/
 source devel/setup.bash
-roslaunch teleop_modes {rover_type}_teleop_modes
+roslaunch teleop_modes {rover_type}_motion_teleop.launch
 ```
 
 2. Press "Arrow Up" after seeing Awaiting command...
