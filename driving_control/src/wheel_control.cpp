@@ -43,6 +43,10 @@ void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &
 
 void WheelControl::controlMotors()
 {
+
+    // See https://bitbucket.org/AndyZe/pid/src/master/src/pid.cpp
+    // for a better implementation
+        
     double m1 = Kp_*(w1_cmd_ - w1_current_);
     double m2 = Kp_*(w2_cmd_ - w2_current_);
     double m3 = Kp_*(w3_cmd_ - w3_current_);

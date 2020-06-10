@@ -13,8 +13,8 @@
 DrivingTools::DrivingTools()
 {
   // Publishers
-  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("/motor_efforts", 1000);
-  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("/steering_joint_angles", 1000);
+  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
+  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("steering_joint_angles", 1000);
 
   // Service Servers
   stopServer = nh_.advertiseService("stop", &DrivingTools::Stop, this);
