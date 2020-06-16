@@ -38,6 +38,7 @@ private:
     ros::Subscriber subWheelVelCmds;
     ros::Subscriber subJointStates;
 
+    // void doCalculations();
     // Callback function for subscribers.
     void wheelVelCmdsCallback(const driving_control::WheelVelCmds::ConstPtr &msg);
     void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
@@ -52,12 +53,14 @@ private:
     double w3_cmd_ = 0.0;
     double w4_cmd_ = 0.0;
 
-    double Kp_ = 100;   
+    // PID gains
+    double Kp_ = 50;
 
 public:
     WheelControl(ros::NodeHandle & nh);
 
     void controlMotors();
+
 };
 
 

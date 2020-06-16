@@ -1,7 +1,14 @@
 <launch> 
+  <!-- excavator_motion_control launch file -->
+  <include file="$(find motion_control)/launch/excavator_motion_control.launch"/>
+
+  <!-- excavator_driving_tools launch file -->
+  <include file="$(find driving_tools)/launch/excavator_driving_tools.launch"/>
 
   <group ns="excavator_1">
 
+    <param name="/use_sim_time" value="true"/>
+    
     <node pkg="driving_control"
           name="wheel_control"
           type="wheel_control"

@@ -1,5 +1,11 @@
 <launch>
-<arg name="robot_namespace" default="/hauler_1"/>
+  <!-- hauler_motion_control launch file -->
+  <include file="$(find motion_control)/launch/hauler_motion_control.launch"/>
+
+  <!-- hauler_driving_tools launch file -->
+  <include file="$(find driving_tools)/launch/hauler_driving_tools.launch"/>
+
+  <arg name="robot_namespace" default="/hauler_1"/>
 
 	<remap from="/toggle_light" to="$(arg robot_namespace)/toggle_light"/>  
   <node name="teleop_modes_key" 

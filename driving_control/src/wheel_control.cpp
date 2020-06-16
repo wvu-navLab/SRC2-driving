@@ -26,12 +26,15 @@ void WheelControl::wheelVelCmdsCallback(const driving_control::WheelVelCmds::Con
     w2_cmd_ = msg->w2;
     w3_cmd_ = msg->w3;
     w4_cmd_ = msg->w4;
+
+    // new_state_or_setpt_ = true;
     // ROS_INFO("Joint commands updated.");
     // ROS_INFO_STREAM("Values "<< w1_cmd_<<" "<< w2_cmd_<< " "<< w3_cmd_<< " "<< w4_cmd_);
 }
 
 void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 {
+    
     w1_current_ = msg->velocity[14]; //fr_wheel_joint
     w2_current_ = msg->velocity[6]; //br_wheel_joint
     w3_current_ = msg->velocity[11]; //fl_wheel_joint

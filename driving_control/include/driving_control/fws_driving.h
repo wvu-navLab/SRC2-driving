@@ -15,6 +15,7 @@
 // Include cpp important headers
 #include <math.h>
 #include <stdio.h> 
+#include <chrono>
 #include <thread>
 
 // ROS headers
@@ -45,6 +46,8 @@ public:
     void updateCommand(const ros::Time& time, const ros::Duration& period);
 
     void brake();
+
+    ros::Duration getPeriod() const {return ros::Duration(0.01);}
 
     void cmdVelCallback(const geometry_msgs::Twist& command);
 
