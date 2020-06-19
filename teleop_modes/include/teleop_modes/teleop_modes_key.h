@@ -5,8 +5,8 @@
  * TeleopModesKey creates a ROS node that allows the control of the SRC2 Rovers
  * with a keyboard.
  *
- * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@wvu.mix.edu
- * \author Cagri Kilic, WVU - cakilic@wvu.mix.edu
+ * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@mix.wvu.edu
+ * \author Cagri Kilic, WVU - cakilic@mix.wvu.edu
  * * \date March 28, 2020
  */
 

@@ -7,8 +7,8 @@
  * Adapted from four_wheel_steering_controller.cpp 
  * https://github.com/ros-controls/ros_controllers/blob/noetic-devel/four_wheel_steering_controller/src/four_wheel_steering_controller.cpp
  * 
- * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@wvu.mix.edu
- * \author Chris Tatsch, WVU - ca0055@wvu.mix.edu
+ * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@mix.wvu.edu
+ * \author Chris Tatsch, WVU - ca0055@mix.wvu.edu
  * \date June 01, 2020
  */
 

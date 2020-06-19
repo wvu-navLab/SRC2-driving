@@ -4,8 +4,8 @@
  *
  * Four wheel steering driving (...).
  *
- * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@wvu.mix.edu
- * \author Chris Tatsch, WVU - ca0055@wvu.mix.edu
+ * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@mix.wvu.edu
+ * \author Chris Tatsch, WVU - ca0055@mix.wvu.edu
  * \date June 01, 2020
  */
 

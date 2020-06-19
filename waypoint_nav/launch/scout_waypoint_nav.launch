@@ -1,0 +1,22 @@
+<launch> 
+  <!-- excavator_driving_tools launch file -->
+  <include file="$(find driving_control)/launch/scout_driving_control.launch"/>
+
+  <group ns="scout_1">
+
+    <param name="/use_sim_time" value="true"/>
+    
+    <node pkg="waypoint_nav"
+          name="waypoint_nav"
+          type="waypoint_nav"
+          output="screen">
+    </node>
+    <node pkg="waypoint_nav"
+          name="avoidance_lidar"
+          type="avoidance_lidar"
+          output="screen">
+    </node>
+
+  </group>
+
+</launch>
