@@ -5,7 +5,7 @@
  * Lidar Avoidance for waypoint navigation (...).
  * 
  * \author Matteo De Petrillo, WVU - madepetrillo@mix.wvu.edu
- * \date June 01, 2020
+ * \date June 20, 2020
  */
 
 #include <stdio.h>

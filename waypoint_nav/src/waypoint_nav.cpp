@@ -4,9 +4,9 @@
  *
  * Waypoint navigation (...).
  * 
- * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@mix.wvu.edu
  * \author Matteo Petrillo, WVU - madepetrillo@mix.wvu.edu
- * \date June 01, 2020
+ * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@mix.wvu.edu
+ * \date June 20, 2020
  */
 
 #include "waypoint_nav/waypoint_nav.h"

@@ -1,6 +1,6 @@
 /*!
  * \fws_driving.cpp
- * \brief 4ws_driving (...).
+ * \brief fws_driving (...).
  *
  * Four wheel steering driving (...).
  *
