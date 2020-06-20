@@ -21,7 +21,7 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     , wheel_steering_y_offset_(0.0)
     , wheel_radius_(0.0)
     , wheel_separation_length_(0.0)
-    , cmd_vel_timeout_(10)
+    , cmd_vel_timeout_(5)
     , enable_twist_cmd_(true)
 {
 
@@ -100,6 +100,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     cmd = &curr_cmd_twist;
 
     const double dt = (time - cmd->stamp).toSec();
+    ROS_INFO_STREAM("dt: " << dt);
 
     // Brake if cmd_vel has timeout:
     if (dt > cmd_vel_timeout_)

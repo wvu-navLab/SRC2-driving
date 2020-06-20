@@ -46,8 +46,10 @@ void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan)
   float left[50];
   int l;
   int r;
-  for (int i = 0;i<100;i++){
-    if (scan->ranges[i]<2.0){
+  for (int i = 0;i<100;i++)
+  {
+    if (scan->ranges[i]<2.0)
+    {
       cclose = true;
       for(int j=0;j<100;j++)
       {
@@ -93,15 +95,15 @@ void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan)
         dir.data = (idl+4)*(0.0262626260519);
         cout<<dir.data<<endl;
         cout<<idl<<endl;
+      }
     }
-  }
-  else if(scan->ranges[i]>2.0 && cclose==false)
-  {
-    dir.data=0;
-    // cout<<"dist > 2 meters"<<endl;
-  }
-  l = 0;
-  r = 0;
+    else if(scan->ranges[i]>2.0 && cclose==false)
+    {
+      dir.data=0;
+      // cout<<"dist > 2 meters"<<endl;
+    }
+    l = 0;
+    r = 0;
   }
   int g = sizeof(scan->ranges)/sizeof(scan->ranges[0]);
 }

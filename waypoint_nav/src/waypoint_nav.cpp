@@ -95,13 +95,14 @@ void WaypointNavigation::commandVelocity()
     ey = goalPos_.position.y - localPos_curr_.position.y;
     pf = std::hypot(ex, ey);
 
-    vd = 1;
-    if (vd<1) 
-    {
-        vd=2;
-    }
-    vFB = std::hypot(localVel_curr_.linear.x, localVel_curr_.linear.y);
-    ev = vd-vFB;
+    vd = 1.5;
+    // if (vd<1) 
+    // {
+    //     vd=2;
+    // }
+    // vFB = std::hypot(localVel_curr_.linear.x, localVel_curr_.linear.y);
+    // ev = vd-vFB;
+    ev = vd;
 
     if (pf > 0.2) 
     {
@@ -116,7 +117,7 @@ void WaypointNavigation::commandVelocity()
             cmd_vel.linear.z = 0.0;
             cmd_vel.angular.x = 0.0;
             cmd_vel.angular.y = 0.0;
-            cmd_vel.angular.z = 0.2;
+            cmd_vel.angular.z = -0.2;
             // ROS_INFO_STREAM("Rotate in place");
         }
         else
@@ -126,7 +127,7 @@ void WaypointNavigation::commandVelocity()
             cmd_vel.linear.z = 0.0;
             cmd_vel.angular.x = 0.0;
             cmd_vel.angular.y = 0.0;
-            cmd_vel.angular.z = -0.2;
+            cmd_vel.angular.z = 0.2;
             // ROS_INFO_STREAM("Rotate in place");
         }
         if (abs(et) < 0.07) 
@@ -186,7 +187,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "waypoint_nav");
     ros::NodeHandle nh("");
     
-    ros::Rate rate(200.0);
+    ros::Rate rate(300);
     
     ROS_INFO("Waypoint Nav Node initializing...");
     WaypointNavigation waypoint_nav(nh);
