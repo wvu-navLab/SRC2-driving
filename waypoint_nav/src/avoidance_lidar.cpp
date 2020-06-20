@@ -33,104 +33,98 @@ using namespace std;
 
 geometry_msgs::Pose pos_curr, localPos_curr;
 geometry_msgs::Twist localVel_curr;
-// std_msgs::Bool rr,ll;
+
 std_msgs::Float64 dir;
 bool cclose = false;
 
 
-// subscriber to the ground truth to use as pose feedback
-void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan){
-    // cout<< "range max "<<scan->ranges[0]<<endl;
-    cout<< "range front "<<scan->ranges[50]<<endl;
-    int c = 50;
-    float right[50];
-    float left[50];
-    int l;
-    int r;
-    for (int i = 0;i<100;i++){
-      if (scan->ranges[i]<2.0){
-        cclose = true;
-        for(int j=0;j<100;j++){
-          if(isinf(scan->ranges[c-j]) || scan->ranges[c-j]>8.0){
-            r=r+1;
-          }
-           if(isinf(scan->ranges[c+j]) || scan->ranges[c+j]>8.0){
-            l=l+1;
+void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan)
+{
+  // cout << "range front "<<scan->ranges[50]<<endl;
+  int c = 50;
+  float right[50];
+  float left[50];
+  int l;
+  int r;
+  for (int i = 0;i<100;i++){
+    if (scan->ranges[i]<2.0){
+      cclose = true;
+      for(int j=0;j<100;j++)
+      {
+        if(isinf(scan->ranges[c-j]) || scan->ranges[c-j]>8.0)
+        {
+          r=r+1;
+        }
+        if(isinf(scan->ranges[c+j]) || scan->ranges[c+j]>8.0)
+        {
+          l=l+1;
+        }
+      }
+      // cout<<"number of rightINF "<<r<<endl;
+      // cout<<"number of leftINf "<<l<<endl;
+      if(r>l)
+      {
+        float rmax = scan->ranges[50];
+        int idr=0;
+        for(int s=50;s>0;s--)
+        {
+          if(scan->ranges[s] > rmax)
+          {
+            rmax = scan->ranges[s];
+            idr = s;
           }
         }
-        cout<<"number of rightINF "<<r<<endl;
-        cout<<"number of leftINf "<<l<<endl;
-        if(r>l){
-          float rmax = scan->ranges[50];
-          int idr=0;
-
-          for(int s=50;s>0;s--){
-            if(scan->ranges[s] > rmax){
-              rmax = scan->ranges[s];
-              idr = s;
-            }
-          }
-
-          dir.data = (idr+4)*(-0.0262626260519);
-          cout<<dir.data<<endl;
-          cout<<idr<<endl;
-
-          }
-        else {
-          float lmax = scan->ranges[50];
-          int idl=0;
-          for(int sl=50;sl<100;sl++){
-            if(scan->ranges[sl] > lmax){
-              lmax = scan->ranges[sl];
-              idl = sl;
-            }
-          }
-          dir.data = (idl+4)*(0.0262626260519);
-          cout<<dir.data<<endl;
-          cout<<idl<<endl;
+        dir.data = (idr+4)*(-0.0262626260519);
+        cout<<dir.data<<endl;
+        cout<<idr<<endl;
       }
+      else 
+      {
+        float lmax = scan->ranges[50];
+        int idl=0;
+        for(int sl=50;sl<100;sl++)
+        {
+          if(scan->ranges[sl] > lmax)
+          {
+            lmax = scan->ranges[sl];
+            idl = sl;
+          }
+        }
+        dir.data = (idl+4)*(0.0262626260519);
+        cout<<dir.data<<endl;
+        cout<<idl<<endl;
     }
-      else if(scan->ranges[i]>2.0 && cclose==false){
-        dir.data=0;
-        cout<<"dist > 2 meters"<<endl;
-      }
-
-      l = 0;
-      r = 0;
-
-    }
-    int g = sizeof(scan->ranges)/sizeof(scan->ranges[0]);
-
-
-
+  }
+  else if(scan->ranges[i]>2.0 && cclose==false)
+  {
+    dir.data=0;
+    // cout<<"dist > 2 meters"<<endl;
+  }
+  l = 0;
+  r = 0;
+  }
+  int g = sizeof(scan->ranges)/sizeof(scan->ranges[0]);
 }
 
 
 
 int main(int argc, char **argv){
 
-        ros::init(argc, argv, "waypoints_nav");
-        ros::NodeHandle nh;
+  ros::init(argc, argv, "avoidance_lidar");
+  ros::NodeHandle nh("");
 
-        ros::Subscriber lidar = nh.subscribe<sensor_msgs::LaserScan>("/scout_1/laser/scan",1, lidar_clud);
-        // ros::Publisher directionl = nh.advertise<std_msgs::Bool>("/direction/left",1000);
-        // ros::Publisher directionr = nh.advertise<std_msgs::Bool>("/direction/right",1000);
-        ros::Publisher directionr = nh.advertise<std_msgs::Float64>("/direction",1000);
+  ros::Subscriber lidar = nh.subscribe<sensor_msgs::LaserScan>("laser/scan",1, lidar_clud);
+  ros::Publisher directionr = nh.advertise<std_msgs::Float64>("direction",1000);
 
+  ros::Rate rate(100);
 
+  while (ros::ok()) 
+  {
+    directionr.publish(dir);
+    cclose = false;
+    ros::spinOnce();
+    rate.sleep();
+  }
 
-        ros::Rate rate(100.0);
-
-        while (ros::ok()) {
-                // directionl.publish(ll);
-                directionr.publish(dir);
-                cclose = false;
-                ros::spinOnce();
-                rate.sleep();
-                // ll.data = false;
-                // rr.data = false;
-
-        }
-
-
+  return 0;
 }

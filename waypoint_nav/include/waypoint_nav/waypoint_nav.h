@@ -54,6 +54,7 @@ private:
     ros::Publisher pubCmdVel;
 
     double avoid_angle_ = 0.0;
+    double Kp_yaw_ = 5.0;
     bool rr_ = false;
     bool ll_ = false;
     

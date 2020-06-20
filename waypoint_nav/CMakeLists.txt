@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   geometry_msgs
+  sensor_msgs
   nav_msgs
   srcp2_msgs
 )
@@ -52,9 +53,9 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-)
+# add_message_files(
+#   FILES
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -75,6 +76,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   geometry_msgs
+  sensor_msgs
   nav_msgs
 )
 
@@ -110,7 +112,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES waypoint_nav
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs nav_msgs
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs nav_msgs sensor_msgs
 #  DEPENDS system_lib
 )
 
