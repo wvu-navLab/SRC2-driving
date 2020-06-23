@@ -34,11 +34,36 @@ void WheelControl::wheelVelCmdsCallback(const driving_control::WheelVelCmds::Con
 
 void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 {
+    int fr_wheel_joint_idx;
+    int br_wheel_joint_idx;
+    int fl_wheel_joint_idx;
+    int bl_wheel_joint_idx;
     
-    w1_current_ = msg->velocity[14]; //fr_wheel_joint
-    w2_current_ = msg->velocity[6]; //br_wheel_joint
-    w3_current_ = msg->velocity[11]; //fl_wheel_joint
-    w4_current_ = msg->velocity[3]; //bl_wheel_joint
+    //get robot name
+    for(int i=0; i<msg->name.size(); i++) 
+    {
+        if(msg->name[i] == "fr_wheel_joint") 
+        {
+            fr_wheel_joint_idx = i;
+        }
+        if(msg->name[i] == "br_wheel_joint") 
+        {
+            br_wheel_joint_idx = i;
+        }
+        if(msg->name[i] == "fl_wheel_joint") 
+        {
+            fl_wheel_joint_idx = i;
+        }
+        if(msg->name[i] == "bl_wheel_joint") 
+        {
+            bl_wheel_joint_idx = i;
+        }
+    }
+
+    w1_current_ = msg->velocity[fr_wheel_joint_idx]; //fr_wheel_joint
+    w2_current_ = msg->velocity[br_wheel_joint_idx]; //br_wheel_joint
+    w3_current_ = msg->velocity[fl_wheel_joint_idx]; //fl_wheel_joint
+    w4_current_ = msg->velocity[bl_wheel_joint_idx]; //bl_wheel_joint
 
     // ROS_INFO("Joint states updated.");
     // ROS_INFO_STREAM("Values "<< w1_current_<<" "<< w2_current_<< " "<< w3_current_<< " "<< w4_current_);
@@ -79,7 +104,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "wheel_control");
     ros::NodeHandle nh("");
-    ros::Rate rate(50);
+    ros::Rate rate(100);
 
     ROS_INFO("Wheel Velocity Controller initializing...");
     WheelControl wheel_control(nh);

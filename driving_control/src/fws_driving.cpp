@@ -91,7 +91,6 @@ void FourWheelSteeringDriving::cmdVelCallback(const geometry_msgs::Twist& comman
                             << "Stamp: " << command_struct_twist_.stamp);
 }
 
-
 void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::Duration& period)
 {
     // Retreive current velocity command and time step:
@@ -230,13 +229,10 @@ int main(int argc, char **argv)
     ROS_INFO("Four Wheel Steering Driving Node initializing...");
     FourWheelSteeringDriving fws_driving(nh);
 
-    ros::Publisher clock_publisher = nh.advertise<rosgraph_msgs::Clock>("/clock", 1);
-
-    ros::AsyncSpinner spinner(1);
-    spinner.start();
-
     ros::Time internal_time(0);
     const ros::Duration dt = fws_driving.getPeriod();
+    ros::Rate rate(100);
+
 
     ROS_WARN_STREAM("Period: " << dt.toSec());
 
@@ -246,13 +242,11 @@ int main(int argc, char **argv)
     {
         fws_driving.updateCommand(internal_time, dt);
 
-        rosgraph_msgs::Clock clock;
-        clock.clock = ros::Time(internal_time);
-        clock_publisher.publish(clock);
         internal_time += dt;
-    }
+        ros::spinOnce();
+        rate.sleep();
 
-    spinner.stop();
+    }
 
     fws_driving.stopping(internal_time);
 
