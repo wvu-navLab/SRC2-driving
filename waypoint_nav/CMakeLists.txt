@@ -72,13 +72,13 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-  sensor_msgs
-  nav_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+#   sensor_msgs
+#   nav_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -146,11 +146,11 @@ include_directories(
 
 add_executable(avoidance_lidar src/avoidance_lidar.cpp)
 target_link_libraries(avoidance_lidar ${catkin_LIBRARIES})
-add_dependencies(avoidance_lidar waypoint_nav_generate_messages_cpp)
+# add_dependencies(avoidance_lidar waypoint_nav_generate_messages_cpp)
 
 add_executable(waypoint_nav src/waypoint_nav.cpp)
 target_link_libraries(waypoint_nav ${catkin_LIBRARIES})
-add_dependencies(waypoint_nav waypoint_nav_generate_messages_cpp)
+# add_dependencies(waypoint_nav waypoint_nav_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

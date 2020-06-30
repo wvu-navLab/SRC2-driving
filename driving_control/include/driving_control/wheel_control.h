@@ -54,7 +54,7 @@ private:
     double w4_cmd_ = 0.0;
 
     // PID gains
-    double Kp_ = 50;cd
+    double Kp_ = 50;
 
 public:
     WheelControl(ros::NodeHandle & nh);
