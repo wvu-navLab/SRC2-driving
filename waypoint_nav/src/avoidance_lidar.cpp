@@ -77,8 +77,8 @@ void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan)
           }
         }
         dir.data = (idr+4)*(-0.0262626260519);
-        cout<<dir.data<<endl;
-        cout<<idr<<endl;
+        // cout<<dir.data<<endl;
+        // cout<<idr<<endl;
       }
       else 
       {
@@ -93,8 +93,8 @@ void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan)
           }
         }
         dir.data = (idl+4)*(0.0262626260519);
-        cout<<dir.data<<endl;
-        cout<<idl<<endl;
+        // cout<<dir.data<<endl;
+        // cout<<idl<<endl;
       }
     }
     else if(scan->ranges[i]>2.0 && cclose==false)

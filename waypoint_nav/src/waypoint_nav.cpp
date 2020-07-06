@@ -41,7 +41,7 @@ void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& ms
 void WaypointNavigation::goalCallback(const geometry_msgs::Pose& msg)
 {
     goalPos_ = msg;
-    ROS_INFO_STREAM("Goal pos"<<goalPos_);
+    ROS_INFO_STREAM("New goal "<<goalPos_);
 }
 
 void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg)
