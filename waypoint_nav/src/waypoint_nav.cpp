@@ -102,7 +102,7 @@ void WaypointNavigation::commandVelocity()
     // }
     // vFB = std::hypot(localVel_curr_.linear.x, localVel_curr_.linear.y);
     // ev = vd-vFB;
-    ev = vd;
+    ev = vd/2;
 
     if (pf > 0.2) 
     {
@@ -117,7 +117,7 @@ void WaypointNavigation::commandVelocity()
             cmd_vel.linear.z = 0.0;
             cmd_vel.angular.x = 0.0;
             cmd_vel.angular.y = 0.0;
-            cmd_vel.angular.z = -0.2;
+            cmd_vel.angular.z = -0.4;
             // ROS_INFO_STREAM("Rotate in place");
         }
         else
@@ -127,12 +127,12 @@ void WaypointNavigation::commandVelocity()
             cmd_vel.linear.z = 0.0;
             cmd_vel.angular.x = 0.0;
             cmd_vel.angular.y = 0.0;
-            cmd_vel.angular.z = 0.2;
+            cmd_vel.angular.z = 0.4;
             // ROS_INFO_STREAM("Rotate in place");
         }
-        if (abs(et) < 0.07) 
+        if (abs(et) < 0.3) 
         {
-            cmd_vel.linear.x = ev;
+            cmd_vel.linear.x = vd;
             cmd_vel.linear.y = 0.0;
             cmd_vel.linear.z = 0.0;
             cmd_vel.angular.x = 0.0;
