@@ -17,7 +17,7 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
     // Subscriber
     subOdom = nh_.subscribe("dead_reckoning/odometry", 1, &WaypointNavigation::odometryCallback, this);
     subOdomTruth = nh_.subscribe("odometry/truth", 1, &WaypointNavigation::odometryTruthCallback, this);
-    subGoal = nh_.subscribe("/volatile_pos", 1, &WaypointNavigation::goalCallback, this);
+    subGoal = nh_.subscribe("navigation/goal_pos", 1, &WaypointNavigation::goalCallback, this);
     subAvoidDirection = nh_.subscribe("direction", 100, &WaypointNavigation::avoidObstacleCallback, this);
 
     // Publisher
@@ -41,7 +41,7 @@ void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& ms
 void WaypointNavigation::goalCallback(const geometry_msgs::Pose& msg)
 {
     goalPos_ = msg;
-    // ROS_INFO_STREAM("Goal pos"<<goalPos_);
+    ROS_INFO_STREAM("Goal pos"<<goalPos_);
 }
 
 void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg)
@@ -170,7 +170,7 @@ void WaypointNavigation::commandVelocity()
         cmd_vel.angular.y = 0.0;
         cmd_vel.angular.z = 0.0;
     }
-    ROS_INFO_STREAM("Commanded vel" << cmd_vel);
+    // ROS_INFO_STREAM("Commanded vel" << cmd_vel);
     pubCmdVel.publish(cmd_vel);
 }
 

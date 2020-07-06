@@ -99,7 +99,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     cmd = &curr_cmd_twist;
 
     const double dt = (time - cmd->stamp).toSec();
-    ROS_INFO_STREAM("dt: " << dt);
+    // ROS_INFO_STREAM("dt: " << dt);
 
     // Brake if cmd_vel has timeout:
     if (dt > cmd_vel_timeout_)
