@@ -152,6 +152,10 @@ add_executable(waypoint_nav src/waypoint_nav.cpp)
 target_link_libraries(waypoint_nav ${catkin_LIBRARIES})
 # add_dependencies(waypoint_nav waypoint_nav_generate_messages_cpp)
 
+add_executable(imu_rpy_noise src/imu_rpy_noise.cpp)
+target_link_libraries(imu_rpy_noise ${catkin_LIBRARIES})
+# add_dependencies(imu_rpy_noise waypoint_nav_generate_messages_cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -172,6 +176,10 @@ target_link_libraries(avoidance_lidar
 )
 
 target_link_libraries(waypoint_nav 
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(imu_rpy_noise 
   ${catkin_LIBRARIES}
 )
 
