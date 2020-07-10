@@ -215,7 +215,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     std_msgs::Int64 mode;
     mode.data = driving_mode_; //fr_steering_joint
     pubDrivingMode.publish(mode);
-    ROS_INFO_STREAM_ONCE("Driving mode published" << mode);
+    ROS_INFO_STREAM("Driving mode published" << mode);
 }
 
 /*!
