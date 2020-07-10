@@ -47,6 +47,7 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     // Publisher
     pubWheelVelCmds = nh_.advertise<driving_control::WheelVelCmds>("wheel_vel_cmds", 1000);
     pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("steering_joint_angles", 1000);
+    pubDrivingMode = nh_.advertise<std_msgs::Int64>("navigation/driving_mode", 1000);
 
 
     ROS_INFO_STREAM("cmd stamp:"<<command_struct_twist_.stamp);
@@ -104,9 +105,10 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     // Brake if cmd_vel has timeout:
     if (dt > cmd_vel_timeout_)
     {
-      curr_cmd_twist.lin_x = 0.0;
-      curr_cmd_twist.lin_y = 0.0;
-      curr_cmd_twist.ang = 0.0;
+        driving_mode_ = STOP_MODE;
+        curr_cmd_twist.lin_x = 0.0;
+        curr_cmd_twist.lin_y = 0.0;
+        curr_cmd_twist.ang = 0.0;
     }
 
     const double cmd_dt(period.toSec());
@@ -126,6 +128,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
 
         if (wz_flag && !vx_flag && !vy_flag) // Turn-in-place Driving
         {
+            driving_mode_ = TIPP_MODE;
             vel_right_front = curr_cmd_twist.ang * std::hypot(wheel_separation_length_,steering_track) / (2 * wheel_radius_);
             vel_right_rear = vel_right_front;
             vel_left_front  = - vel_right_front;
@@ -138,6 +141,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
         } 
         else if (vx_flag && vy_flag && !wz_flag) // All-Wheel Driving (crab motion)
         {
+            driving_mode_ = CRAB_MODE;
             const double sign_vx = copysign(1.0, curr_cmd_twist.lin_x);
             vel_right_front = sign_vx * std::hypot(curr_cmd_twist.lin_y,curr_cmd_twist.lin_x)/ wheel_radius_;
             vel_right_rear = vel_right_front;
@@ -152,6 +156,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
         }
         else // Double Ackermann Driving
         {
+            driving_mode_ = DACK_MODE;
             // Compute wheels velocities:
             if(fabs(curr_cmd_twist.lin_x) > 0.001)
             {
@@ -196,7 +201,6 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     w.w3 = vel_left_front; //fl_wheel_joint
     w.w4 = vel_left_rear; //bl_wheel_joint
     pubWheelVelCmds.publish(w);
-
     // ROS_INFO_STREAM("Wheel velocities commanded" << w);
 
     /// TODO check limits to not apply the same steering on right and left when saturated !
@@ -206,8 +210,12 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     s.s3 = front_left_steering; //fl_steering_joint
     s.s4 = rear_left_steering; //bl_steering_joint
     pubSteeringAngles.publish(s);
-
     // ROS_INFO_STREAM("Steering angles commanded" << s);
+
+    std_msgs::Int64 mode;
+    mode.data = driving_mode_; //fr_steering_joint
+    pubDrivingMode.publish(mode);
+    ROS_INFO_STREAM_ONCE("Driving mode published" << mode);
 }
 
 /*!
