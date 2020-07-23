@@ -5,16 +5,17 @@
   <!-- scout_driving_tools launch file -->
   <include file="$(find driving_tools)/launch/scout_driving_tools.launch"/>
 
-  <arg name="robot_namespace" default="/scout_1"/>
-  
-	<remap from="/toggle_light" to="$(arg robot_namespace)/toggle_light"/>
-  <node name="teleop_modes_key" 
-	pkg="teleop_modes" 
-	type="teleop_modes_key"
-	respawn="false" 
-	output="screen" 
-	ns="$(arg robot_namespace)"/>
+  <group ns="scout_1">
+
+	  <remap from="/toggle_light" to="toggle_light"/>
     
+    <node pkg="teleop_modes"
+          name="teleop_modes"
+          type="teleop_modes_key"
+          output="screen">
+    </node>
+    
+  </group>
 
 </launch>
 
