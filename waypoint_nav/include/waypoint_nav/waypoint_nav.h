@@ -46,7 +46,6 @@ private:
 
     // Subscriber
     ros::Subscriber subOdom;
-    ros::Subscriber subOdomTruth;
     ros::Subscriber subGoal;
     ros::Subscriber subAvoidDirection;
 

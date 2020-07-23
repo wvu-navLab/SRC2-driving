@@ -68,6 +68,11 @@ void ImuRPYNoise::imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
     ROS_INFO_STREAM("YAW mean: "<< mean <<", std deviation: " << stdev << ", data points: "<< v.size());
 }
 
+
+
+
+
+
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "imu_rpy_noise");

@@ -15,21 +15,12 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
     : nh_(nh)
 {
     // Subscriber
-    subOdom = nh_.subscribe("dead_reckoning/odometry", 1, &WaypointNavigation::odometryCallback, this);
-    subOdomTruth = nh_.subscribe("odometry/truth", 1, &WaypointNavigation::odometryTruthCallback, this);
+    subOdom = nh_.subscribe("odometry/truth", 1, &WaypointNavigation::odometryCallback, this);
     subGoal = nh_.subscribe("navigation/goal_pos", 1, &WaypointNavigation::goalCallback, this);
     subAvoidDirection = nh_.subscribe("direction", 100, &WaypointNavigation::avoidObstacleCallback, this);
 
     // Publisher
     pubCmdVel = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-}
-
-void WaypointNavigation::odometryTruthCallback(const nav_msgs::Odometry::ConstPtr& msg)
-{
-    localPos_curr_ = msg->pose.pose;
-    localVel_curr_ = msg->twist.twist;
-    // ROS_INFO_STREAM("odometryTruth"<<localPos_curr_);
-    
 }
 
 void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
