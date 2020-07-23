@@ -27,11 +27,15 @@
 #include <realtime_tools/realtime_publisher.h>
 
 // Custom message includes. Auto-generated from msg/ directory.
+#include <std_msgs/Int64.h>
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 
+#define ARRIVED 0
+#define GOING 1
+#define UNREACHABLE 2
 
 class WaypointNavigation
 {
@@ -51,6 +55,7 @@ private:
 
     // Publisher
     ros::Publisher pubCmdVel;
+    ros::Publisher pubNavStatus;
 
     double avoid_angle_ = 0.0;
     double Kp_yaw_ = 5.0;

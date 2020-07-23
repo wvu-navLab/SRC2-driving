@@ -21,6 +21,7 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
 
     // Publisher
     pubCmdVel = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+    pubNavStatus = nh_.advertise<std_msgs::Int64>("navigation/status", 1000);
 }
 
 void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
@@ -66,6 +67,7 @@ void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr
 
 void WaypointNavigation::commandVelocity()
 {
+    std_msgs::Int64 status;
     geometry_msgs::Twist cmd_vel;
     double ex, ey, et, ephi, phi_d;
     double vd, vFB, ev;
@@ -151,6 +153,7 @@ void WaypointNavigation::commandVelocity()
             cmd_vel.angular.z = 0.0;
             // ROS_INFO_STREAM("Crab motion");
         }
+        status.data = GOING;
     }
     else
     {
@@ -160,9 +163,12 @@ void WaypointNavigation::commandVelocity()
         cmd_vel.angular.x = 0.0;
         cmd_vel.angular.y = 0.0;
         cmd_vel.angular.z = 0.0;
+
+        status.data = ARRIVED;
     }
     // ROS_INFO_STREAM("Commanded vel" << cmd_vel);
     pubCmdVel.publish(cmd_vel);
+    pubNavStatus.publish(status);
 }
 
 /*!

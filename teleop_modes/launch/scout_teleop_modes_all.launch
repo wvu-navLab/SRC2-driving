@@ -1,4 +1,10 @@
 <launch>
+  <!-- scout_motion_control launch file -->
+  <include file="$(find motion_control)/launch/scout_motion_control.launch"/>
+
+  <!-- scout_driving_tools launch file -->
+  <include file="$(find driving_tools)/launch/scout_driving_tools.launch"/>
+
   <arg name="robot_namespace" default="/scout_1"/>
   
 	<remap from="/toggle_light" to="$(arg robot_namespace)/toggle_light"/>
@@ -9,6 +15,7 @@
 	output="screen" 
 	ns="$(arg robot_namespace)"/>
     
+
 </launch>
 
 

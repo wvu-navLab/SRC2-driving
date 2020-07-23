@@ -32,11 +32,10 @@
 #include <driving_tools/Stop.h>
 #include <rosgraph_msgs/Clock.h>
 
-#define STOP_MODE 0;
-#define CRAB_MODE 1;
-#define DACK_MODE 2;
-#define TIPP_MODE 3;
-
+#define STOP_MODE 0
+#define CRAB_MODE 1
+#define DACK_MODE 2
+#define TIPP_MODE 3
 
 // #include <driving_control/speed_limiter.h>
 
