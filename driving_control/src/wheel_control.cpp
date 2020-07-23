@@ -15,9 +15,11 @@
 WheelControl::WheelControl(ros::NodeHandle & nh)
 : nh_(nh)
 {
-    subJointStates = nh_.subscribe("joint_states", 1000, &WheelControl::jointStatesCallback, this);
-    subWheelVelCmds = nh_.subscribe("wheel_vel_cmds", 1000, &WheelControl::wheelVelCmdsCallback, this);
-    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
+    // Subscribers
+    subJointStates = nh_.subscribe("driving/joint_states", 1000, &WheelControl::jointStatesCallback, this);
+    subWheelVelCmds = nh_.subscribe("driving/wheel_vel_cmds", 1000, &WheelControl::wheelVelCmdsCallback, this);
+    // Publishers
+    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 1000);
 }
 
 void WheelControl::wheelVelCmdsCallback(const driving_control::WheelVelCmds::ConstPtr &msg)

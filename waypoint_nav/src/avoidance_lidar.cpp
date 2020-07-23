@@ -116,7 +116,7 @@ int main(int argc, char **argv){
   ros::NodeHandle nh("");
 
   ros::Subscriber lidar = nh.subscribe<sensor_msgs::LaserScan>("laser/scan",1, lidar_clud);
-  ros::Publisher directionr = nh.advertise<std_msgs::Float64>("direction",1000);
+  ros::Publisher directionr = nh.advertise<std_msgs::Float64>("driving/direction",1000);
 
   ros::Rate rate(100);
 

@@ -15,25 +15,48 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
     : nh_(nh)
 {
     // Subscriber
-    subOdom = nh_.subscribe("odometry/truth", 1, &WaypointNavigation::odometryCallback, this);
-    subGoal = nh_.subscribe("navigation/goal_pos", 1, &WaypointNavigation::goalCallback, this);
-    subAvoidDirection = nh_.subscribe("direction", 100, &WaypointNavigation::avoidObstacleCallback, this);
+    subOdom = nh_.subscribe("localization/odometry/sensor_fusion", 10, &WaypointNavigation::odometryCallback, this);
+    subSmach = nh_.subscribe("state_machine/state", 10, &WaypointNavigation::smachCallback, this);
+    subGoal = nh_.subscribe("navigation/goal_position", 10, &WaypointNavigation::goalCallback, this);
+    subAvoidDirection = nh_.subscribe("driving/direction", 10, &WaypointNavigation::avoidObstacleCallback, this);
 
     // Publisher
-    pubCmdVel = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-    pubNavStatus = nh_.advertise<std_msgs::Int64>("navigation/status", 1000);
+    pubCmdVel = nh_.advertise<geometry_msgs::Twist>("driving/cmd_vel", 10);
+    pubNavStatus = nh_.advertise<std_msgs::Int64>("navigation/status", 10);
+    pubWaypointUnreachable = nh_.advertise<std_msgs::Bool>("state_machine/waypoint_unreachable", 10);
+    pubArrivedAtWaypoint = nh_.advertise<std_msgs::Bool>("state_machine/arrived_at_waypoint", 10);
 }
 
 void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
+    if (firstOdom_ == false)
+    {
+        firstOdom_ == true;
+    }
     localPos_curr_ = msg->pose.pose;
     localVel_curr_ = msg->twist.twist;
 }
 
-void WaypointNavigation::goalCallback(const geometry_msgs::Pose& msg)
+void WaypointNavigation::goalCallback(const geometry_msgs::Pose::ConstPtr& msg)
 {
-    goalPos_ = msg;
+    if (firstGoal_ == false)
+    {
+        firstGoal_ == true;
+    }
+    goalPos_ = *msg;
     ROS_INFO_STREAM("New goal "<<goalPos_);
+}
+
+void WaypointNavigation::smachCallback(const std_msgs::Int64::ConstPtr & msg)
+{
+    if (msg->data == TRAV_STATE)
+    {
+        active_ = true;
+    }
+    else
+    {
+        active_ = false;
+    }
 }
 
 void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg)
@@ -68,6 +91,8 @@ void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr
 void WaypointNavigation::commandVelocity()
 {
     std_msgs::Int64 status;
+    std_msgs::Int64 arrived;
+    std_msgs::Int64 unreachable;
     geometry_msgs::Twist cmd_vel;
     double ex, ey, et, ephi, phi_d;
     double vd, vFB, ev;
@@ -167,8 +192,13 @@ void WaypointNavigation::commandVelocity()
         status.data = ARRIVED;
     }
     // ROS_INFO_STREAM("Commanded vel" << cmd_vel);
-    pubCmdVel.publish(cmd_vel);
-    pubNavStatus.publish(status);
+    if (firstGoal_ && firstGoal_)
+    {
+        pubCmdVel.publish(cmd_vel);
+        pubNavStatus.publish(status);
+        pubNavStatus.publish(status);
+        pubNavStatus.publish(status);
+    }
 }
 
 /*!
@@ -192,7 +222,10 @@ int main(int argc, char **argv)
 
     while(ros::ok()) 
     {
-        waypoint_nav.commandVelocity();
+        if (waypoint_nav.active_ == true)
+        {
+            waypoint_nav.commandVelocity();
+        }
         ros::spinOnce();
         rate.sleep();
     }

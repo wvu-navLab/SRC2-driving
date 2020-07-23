@@ -41,13 +41,13 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
 
     clientStop = nh_.serviceClient<driving_tools::Stop>("stop");
 
-    // Subscriber
-    subCmdVel = nh_.subscribe("cmd_vel", 1, &FourWheelSteeringDriving::cmdVelCallback, this);
+    // Subscribers
+    subCmdVel = nh_.subscribe("driving/cmd_vel", 1, &FourWheelSteeringDriving::cmdVelCallback, this);
 
-    // Publisher
-    pubWheelVelCmds = nh_.advertise<driving_control::WheelVelCmds>("wheel_vel_cmds", 1000);
-    pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("steering_joint_angles", 1000);
-    pubDrivingMode = nh_.advertise<std_msgs::Int64>("navigation/driving_mode", 1000);
+    // Publishers
+    pubWheelVelCmds = nh_.advertise<driving_control::WheelVelCmds>("driving/wheel_vel_cmds", 1000);
+    pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("driving/steering_joint_angles", 1000);
+    pubDrivingMode = nh_.advertise<std_msgs::Int64>("driving/driving_mode", 1000);
 
 
     ROS_INFO_STREAM("cmd stamp:"<<command_struct_twist_.stamp);
@@ -215,7 +215,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
     std_msgs::Int64 mode;
     mode.data = driving_mode_; //fr_steering_joint
     pubDrivingMode.publish(mode);
-    ROS_INFO_STREAM("Driving mode published" << mode);
+    // ROS_INFO_STREAM("Driving mode published" << mode);
 }
 
 /*!

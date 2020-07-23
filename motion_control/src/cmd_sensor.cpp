@@ -11,7 +11,7 @@ SensorCommander::SensorCommander(ros::NodeHandle & nh)
  
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("sensor_joint_angle", 1000, &SensorCommander::messageCallback, this);
+  sub_ = nh_.subscribe("driving/sensor_joint_angle", 1000, &SensorCommander::messageCallback, this);
 
   // Node publishes individual joint positions
   pub_ = nh_.advertise<std_msgs::Float64>("sensor_controller/command", 1000);

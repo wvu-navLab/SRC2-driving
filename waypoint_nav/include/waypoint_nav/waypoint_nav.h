@@ -28,6 +28,7 @@
 
 // Custom message includes. Auto-generated from msg/ directory.
 #include <std_msgs/Int64.h>
+#include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
@@ -37,12 +38,20 @@
 #define GOING 1
 #define UNREACHABLE 2
 
+#define INIT_STATE 0
+#define TRAV_STATE 1
+#define PLAN_STATE 2
+#define VOLH_STATE 3
+#define LOST_STATE 4
+
 class WaypointNavigation
 {
 public:
     WaypointNavigation(ros::NodeHandle & nh);
 
     void commandVelocity();
+
+    bool active_ = false;
 
 private:
     // Node Handle
@@ -52,23 +61,29 @@ private:
     ros::Subscriber subOdom;
     ros::Subscriber subGoal;
     ros::Subscriber subAvoidDirection;
+    ros::Subscriber subSmach;
 
     // Publisher
     ros::Publisher pubCmdVel;
     ros::Publisher pubNavStatus;
+    ros::Publisher pubWaypointUnreachable;
+    ros::Publisher pubArrivedAtWaypoint;
 
     double avoid_angle_ = 0.0;
     double Kp_yaw_ = 5.0;
     bool rr_ = false;
     bool ll_ = false;
     
+    bool firstOdom_;
+    bool firstGoal_;
+    
     geometry_msgs::Pose localPos_curr_;
     geometry_msgs::Twist localVel_curr_;
     geometry_msgs::Pose goalPos_;
     
-    void odometryTruthCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void odometryCallback(const nav_msgs::Odometry::ConstPtr& msg);
-    void goalCallback(const geometry_msgs::Pose& msg);
+    void smachCallback(const std_msgs::Int64::ConstPtr& msg);
+    void goalCallback(const geometry_msgs::Pose::ConstPtr& msg);
     void avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg);
 };
 

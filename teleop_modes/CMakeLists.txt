@@ -69,12 +69,12 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-  motion_control
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+#   motion_control
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,8 +107,8 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES motion_control
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs
+  # LIBRARIES motion_control
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control
 #  DEPENDS system_lib
 )
 
@@ -140,7 +140,7 @@ include_directories(
 
 add_executable(teleop_modes_key src/teleop_modes_key.cpp)
 target_link_libraries(teleop_modes_key ${catkin_LIBRARIES})
-add_dependencies(teleop_modes_key teleop_modes_generate_messages_cpp)
+# add_dependencies(teleop_modes_key teleop_modes_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
