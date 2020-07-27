@@ -192,12 +192,12 @@ void WaypointNavigation::commandVelocity()
         status.data = ARRIVED;
     }
     // ROS_INFO_STREAM("Commanded vel" << cmd_vel);
-    if (firstGoal_ && firstGoal_)
+    if (firstGoal_ && firstOdom_)
     {
         pubCmdVel.publish(cmd_vel);
         pubNavStatus.publish(status);
-        pubNavStatus.publish(status);
-        pubNavStatus.publish(status);
+        // pubNavStatus.publish(status);
+        // pubNavStatus.publish(status);
     }
 }
 

@@ -27,12 +27,12 @@
 #include <ros/ros.h>
 
 // Custom message includes. Auto-generated from msg/ directory.
-#include "motion_control/JointGroup.h"
-#include "motion_control/MotorGroup.h"
-#include "motion_control/SteeringGroup.h"
-#include "motion_control/SensorJoint.h"
-#include "motion_control/BinJoint.h"
-#include "srcp2_msgs/ToggleLightSrv.h"
+#include <motion_control/JointGroup.h>
+#include <motion_control/MotorGroup.h>
+#include <motion_control/SteeringGroup.h>
+#include <motion_control/SensorJoint.h>
+#include <motion_control/BinJoint.h>
+#include <srcp2_msgs/ToggleLightSrv.h>
 #define PI 3.14159265
 
 //Keycodes (see https://github.com/simlabrobotics/allegro_hand_ros/blob/master/allegro_hand_keyboard/src/AllegroHand_keyboard.cpp)

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(teleop_modes)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -12,8 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   motion_control
-  message_generation
   srcp2_msgs
+  message_runtime
 )
 
 ## System dependencies are found with CMake's conventions
@@ -69,12 +69,12 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-#   geometry_msgs
-#   motion_control
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+  motion_control
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,8 +107,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  # LIBRARIES motion_control
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control
+#  LIBRARIES motion_control
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control 
 #  DEPENDS system_lib
 )
 
@@ -140,7 +140,7 @@ include_directories(
 
 add_executable(teleop_modes_key src/teleop_modes_key.cpp)
 target_link_libraries(teleop_modes_key ${catkin_LIBRARIES})
-# add_dependencies(teleop_modes_key teleop_modes_generate_messages_cpp)
+add_dependencies(teleop_modes_key teleop_modes_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
