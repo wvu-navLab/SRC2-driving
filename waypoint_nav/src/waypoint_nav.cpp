@@ -17,7 +17,6 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
     // Subscriber
     subOdom = nh_.subscribe("localization/odometry/sensor_fusion", 10, &WaypointNavigation::odometryCallback, this);
     subSmach = nh_.subscribe("state_machine/state", 10, &WaypointNavigation::smachCallback, this);
-    subGoal = nh_.subscribe("navigation/goal_position", 10, &WaypointNavigation::goalCallback, this);
     subAvoidDirection = nh_.subscribe("driving/direction", 10, &WaypointNavigation::avoidObstacleCallback, this);
 
     // Publisher
@@ -25,6 +24,11 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
     pubNavStatus = nh_.advertise<std_msgs::Int64>("navigation/status", 10);
     pubWaypointUnreachable = nh_.advertise<std_msgs::Bool>("state_machine/waypoint_unreachable", 10);
     pubArrivedAtWaypoint = nh_.advertise<std_msgs::Bool>("state_machine/arrived_at_waypoint", 10);
+
+    // Service Servers
+    srv_set_goal_ = nh_.advertiseService("navigation/set_goal", &WaypointNavigation::setGoal, this);
+    srv_interrupt_ = nh_.advertiseService("navigation/interrupt", &WaypointNavigation::interrupt, this);
+
 }
 
 void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
@@ -37,14 +41,39 @@ void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& ms
     localVel_curr_ = msg->twist.twist;
 }
 
-void WaypointNavigation::goalCallback(const geometry_msgs::Pose::ConstPtr& msg)
+bool WaypointNavigation::interrupt(waypoint_nav::Interrupt::Request &req, waypoint_nav::Interrupt::Response &res)
 {
-    if (firstGoal_ == false)
+    if (req.interrupt == true)
     {
-        firstGoal_ == true;
+        active_ = false;
     }
-    goalPos_ = *msg;
-    ROS_INFO_STREAM("New goal "<<goalPos_);
+    else
+    {
+        active_ = true;
+    }
+    res.success = true;
+    return true;
+}
+
+bool WaypointNavigation::setGoal(waypoint_nav::SetGoal::Request &req, waypoint_nav::SetGoal::Response &res)
+{
+    if (req.start == true)
+    {
+        if (firstGoal_ == false)
+        {
+            firstGoal_ == true;
+        }
+        
+        goalPos_ = req.goal;        
+        ROS_INFO_STREAM("New goal "<< goalPos_);
+        res.success = false;
+    }
+    else
+    {
+        goalPos_ = localPos_curr_;
+        res.success = false;
+    }
+    return true;
 }
 
 void WaypointNavigation::smachCallback(const std_msgs::Int64::ConstPtr & msg)
@@ -179,6 +208,7 @@ void WaypointNavigation::commandVelocity()
             // ROS_INFO_STREAM("Crab motion");
         }
         status.data = GOING;
+        arrived.data = false;
     }
     else
     {
@@ -190,14 +220,18 @@ void WaypointNavigation::commandVelocity()
         cmd_vel.angular.z = 0.0;
 
         status.data = ARRIVED;
+        arrived.data = true;
     }
     // ROS_INFO_STREAM("Commanded vel" << cmd_vel);
+
+    unreachable.data = false;
+
     if (firstGoal_ && firstOdom_)
     {
         pubCmdVel.publish(cmd_vel);
         pubNavStatus.publish(status);
-        // pubNavStatus.publish(status);
-        // pubNavStatus.publish(status);
+        pubArrivedAtWaypoint.publish(arrived);
+        pubWaypointUnreachable.publish(unreachable);
     }
 }
 

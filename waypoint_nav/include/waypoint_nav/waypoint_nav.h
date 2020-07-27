@@ -33,6 +33,8 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
+#include <waypoint_nav/SetGoal.h>
+#include <waypoint_nav/Interrupt.h>
 
 #define ARRIVED 0
 #define GOING 1
@@ -69,6 +71,9 @@ private:
     ros::Publisher pubWaypointUnreachable;
     ros::Publisher pubArrivedAtWaypoint;
 
+    ros::ServiceServer srv_set_goal_;
+    ros::ServiceServer srv_interrupt_;
+
     double avoid_angle_ = 0.0;
     double Kp_yaw_ = 5.0;
     bool rr_ = false;
@@ -85,6 +90,9 @@ private:
     void smachCallback(const std_msgs::Int64::ConstPtr& msg);
     void goalCallback(const geometry_msgs::Pose::ConstPtr& msg);
     void avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg);
+
+    bool setGoal(waypoint_nav::SetGoal::Request &req, waypoint_nav::SetGoal::Response &res);
+    bool interrupt(waypoint_nav::Interrupt::Request &req, waypoint_nav::Interrupt::Response &res);
 };
 
 
