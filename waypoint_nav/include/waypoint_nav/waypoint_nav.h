@@ -14,7 +14,7 @@
 
 // Include cpp important headers
 #include <math.h>
-#include <stdio.h> 
+#include <stdio.h>
 #include <chrono>
 #include <thread>
 #include <termios.h>
@@ -78,14 +78,14 @@ private:
     double Kp_yaw_ = 5.0;
     bool rr_ = false;
     bool ll_ = false;
-    
+
     bool firstOdom_;
     bool firstGoal_;
-    
+
     geometry_msgs::Pose localPos_curr_;
     geometry_msgs::Twist localVel_curr_;
     geometry_msgs::Pose goalPos_;
-    
+
     void odometryCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void smachCallback(const std_msgs::Int64::ConstPtr& msg);
     void goalCallback(const geometry_msgs::Pose::ConstPtr& msg);
