@@ -45,7 +45,17 @@ bool WaypointNavigation::interrupt(waypoint_nav::Interrupt::Request &req, waypoi
 {
     if (req.interrupt == true)
     {
+        geometry_msgs::Twist cmd_vel;
+
         active_ = false;
+        cmd_vel.linear.x = 0.0;
+        cmd_vel.linear.y = 0.0;
+        cmd_vel.linear.z = 0.0;
+        cmd_vel.angular.x = 0.0;
+        cmd_vel.angular.y = 0.0;
+        cmd_vel.angular.z = 0.0;
+        pubCmdVel.publish(cmd_vel);
+        ROS_INFO_STREAM("I got here");
     }
     else
     {
