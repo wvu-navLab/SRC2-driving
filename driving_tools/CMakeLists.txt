@@ -110,7 +110,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES motion_control
+#  LIBRARIES motion_control
   CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control 
 #  DEPENDS system_lib
 )
