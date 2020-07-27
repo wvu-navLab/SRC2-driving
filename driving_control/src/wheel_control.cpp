@@ -16,7 +16,7 @@ WheelControl::WheelControl(ros::NodeHandle & nh)
 : nh_(nh)
 {
     // Subscribers
-    subJointStates = nh_.subscribe("driving/joint_states", 1000, &WheelControl::jointStatesCallback, this);
+    subJointStates = nh_.subscribe("joint_states", 1000, &WheelControl::jointStatesCallback, this);
     subWheelVelCmds = nh_.subscribe("driving/wheel_vel_cmds", 1000, &WheelControl::wheelVelCmdsCallback, this);
     // Publishers
     pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 1000);

@@ -35,7 +35,7 @@ void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& ms
 {
     if (firstOdom_ == false)
     {
-        firstOdom_ == true;
+        firstOdom_ = true;
     }
     localPos_curr_ = msg->pose.pose;
     localVel_curr_ = msg->twist.twist;
@@ -82,10 +82,6 @@ void WaypointNavigation::smachCallback(const std_msgs::Int64::ConstPtr & msg)
     {
         active_ = true;
     }
-    else
-    {
-        active_ = false;
-    }
 }
 
 void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg)
@@ -120,8 +116,8 @@ void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr
 void WaypointNavigation::commandVelocity()
 {
     std_msgs::Int64 status;
-    std_msgs::Int64 arrived;
-    std_msgs::Int64 unreachable;
+    std_msgs::Bool arrived;
+    std_msgs::Bool unreachable;
     geometry_msgs::Twist cmd_vel;
     double ex, ey, et, ephi, phi_d;
     double vd, vFB, ev;
