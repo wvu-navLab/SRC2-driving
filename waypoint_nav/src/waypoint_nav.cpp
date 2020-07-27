@@ -3,7 +3,7 @@
  * \brief waypoint_nav (...).
  *
  * Waypoint navigation (...).
- * 
+ *
  * \author Matteo Petrillo, WVU - madepetrillo@mix.wvu.edu
  * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@mix.wvu.edu
  * \date June 20, 2020
@@ -35,7 +35,7 @@ void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& ms
 {
     if (firstOdom_ == false)
     {
-        firstOdom_ == true;
+        firstOdom_ = true;
     }
     localPos_curr_ = msg->pose.pose;
     localVel_curr_ = msg->twist.twist;
@@ -61,11 +61,11 @@ bool WaypointNavigation::setGoal(waypoint_nav::SetGoal::Request &req, waypoint_n
     {
         if (firstGoal_ == false)
         {
-            firstGoal_ == true;
+            firstGoal_ = true;
         }
-        
-        goalPos_ = req.goal;        
-        ROS_INFO_STREAM("New goal "<< goalPos_);
+
+        goalPos_ = req.goal;
+        // ROS_INFO_STREAM("New goal "<< goalPos_);
         res.success = false;
     }
     else
@@ -82,15 +82,11 @@ void WaypointNavigation::smachCallback(const std_msgs::Int64::ConstPtr & msg)
     {
         active_ = true;
     }
-    else
-    {
-        active_ = false;
-    }
 }
 
 void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg)
 {
-   if (msg->data > 0 && msg->data < 0.758 ) 
+   if (msg->data > 0 && msg->data < 0.758 )
    {
         rr_ = true;
         ll_ = false;
@@ -120,8 +116,8 @@ void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr
 void WaypointNavigation::commandVelocity()
 {
     std_msgs::Int64 status;
-    std_msgs::Int64 arrived;
-    std_msgs::Int64 unreachable;
+    std_msgs::Bool arrived;
+    std_msgs::Bool unreachable;
     geometry_msgs::Twist cmd_vel;
     double ex, ey, et, ephi, phi_d;
     double vd, vFB, ev;
@@ -141,9 +137,13 @@ void WaypointNavigation::commandVelocity()
     ex = goalPos_.position.x - localPos_curr_.position.x;
     ey = goalPos_.position.y - localPos_curr_.position.y;
     pf = std::hypot(ex, ey);
+    // ROS_INFO_STREAM("error:"<<pf);
+    // ROS_INFO_STREAM("goalPos_.position"<<goalPos_);
+    // ROS_INFO_STREAM("localPos_curr_.position"<<localPos_curr_);
+    // ROS_INFO_STREAM("yaw: "<<yaw);
 
     vd = 1.5;
-    // if (vd<1) 
+    // if (vd<1)
     // {
     //     vd=2;
     // }
@@ -151,13 +151,16 @@ void WaypointNavigation::commandVelocity()
     // ev = vd-vFB;
     ev = vd/2;
 
-    if (pf > 0.2) 
+    if (pf > 0.2)
     {
         phi_d = atan2(ey,ex);
+
+        // ROS_INFO_STREAM("phi_d: "<<phi_d);
         ephi = phi_d - yaw;
         et = atan2(sin(ephi), cos(ephi));
+        // ROS_INFO_STREAM("et: "<<et);
 
-        if (signbit(et) == 1) 
+        if (signbit(et) == 1)
         {
             cmd_vel.linear.x = 0.0;
             cmd_vel.linear.y = 0.0;
@@ -177,7 +180,7 @@ void WaypointNavigation::commandVelocity()
             cmd_vel.angular.z = 0.4;
             // ROS_INFO_STREAM("Rotate in place");
         }
-        if (abs(et) < 0.3) 
+        if (abs(et) < 0.3)
         {
             cmd_vel.linear.x = vd;
             cmd_vel.linear.y = 0.0;
@@ -247,22 +250,24 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "waypoint_nav");
     ros::NodeHandle nh("");
-    
+
     ros::Rate rate(300);
-    
+
     ROS_INFO("Waypoint Nav Node initializing...");
     WaypointNavigation waypoint_nav(nh);
 
 
-    while(ros::ok()) 
+    while(ros::ok())
     {
         if (waypoint_nav.active_ == true)
         {
             waypoint_nav.commandVelocity();
         }
+        // ROS_INFO_THROTTLE(1,"active_%d",waypoint_nav.active_);
+
         ros::spinOnce();
         rate.sleep();
     }
-                
+
     return 0;
 }
