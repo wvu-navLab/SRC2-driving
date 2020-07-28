@@ -48,7 +48,7 @@ bool WaypointNavigation::interrupt(waypoint_nav::Interrupt::Request &req, waypoi
         geometry_msgs::Twist cmd_vel;
 
         active_ = false;
-        cmd_vel.linear.x = 0.0;
+        cmd_vel.linear.x = 0.5;
         cmd_vel.linear.y = 0.0;
         cmd_vel.linear.z = 0.0;
         cmd_vel.angular.x = 0.0;
@@ -261,7 +261,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "waypoint_nav");
     ros::NodeHandle nh("");
 
-    ros::Rate rate(300);
+    ros::Rate rate(100);
 
     ROS_INFO("Waypoint Nav Node initializing...");
     WaypointNavigation waypoint_nav(nh);
