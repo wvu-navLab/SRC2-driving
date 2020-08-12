@@ -13,14 +13,14 @@
 DrivingTools::DrivingTools()
 {
   // Publishers
-  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 1000);
-  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("driving/steering_joint_angles", 1000);
+  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
+  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("steering_joint_angles", 1000);
 
   // Service Servers
-  stopServer = nh_.advertiseService("driving/stop", &DrivingTools::Stop, this);
-  rotateInPlaceServer = nh_.advertiseService("driving/rotate_in_place", &DrivingTools::RotateInPlace, this);
-  circBaseStationServer = nh_.advertiseService("driving/circ_base_station", &DrivingTools::CirculateBaseStation, this);
-  moveForwardServer = nh_.advertiseService("driving/move_forward", &DrivingTools::MoveForward, this);
+  stopServer = nh_.advertiseService("stop", &DrivingTools::Stop, this);
+  rotateInPlaceServer = nh_.advertiseService("rotate_in_place", &DrivingTools::RotateInPlace, this);
+  circBaseStationServer = nh_.advertiseService("circ_base_station", &DrivingTools::CirculateBaseStation, this);
+  moveForwardServer = nh_.advertiseService("move_forward", &DrivingTools::MoveForward, this);
 }
 
 bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, driving_tools::RotateInPlace::Response &res)

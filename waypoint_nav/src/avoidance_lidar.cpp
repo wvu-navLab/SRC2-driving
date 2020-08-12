@@ -3,7 +3,7 @@
  * \brief Lidar Avoidance (...).
  *
  * Lidar Avoidance for waypoint navigation (...).
- * 
+ *
  * \author Matteo De Petrillo, WVU - madepetrillo@mix.wvu.edu
  * \date June 20, 2020
  */
@@ -37,10 +37,114 @@ geometry_msgs::Twist localVel_curr;
 std_msgs::Float64 dir;
 bool cclose = false;
 
+typedef struct {
+  double i;
+  double distance;
+  double x;
+  double y;
+  double slope;
+} Vector;
+
+
+typedef struct {
+    double distance;
+    int index;
+    bool type; // 0 - first, 1 - end
+} POI;
+
+
 
 void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
-  // cout << "range front "<<scan->ranges[50]<<endl;
+
+
+//have to choose threshold carefully
+  // int length = scan->ranges.size();
+  // double gradient_threshold = 0.5;
+  // double increment = scan->angle_increment;
+	// std::vector<double> gradient;
+	// //Sets up x and y coordinates for gradient as well as creates
+	// //vector of all gradients between all the points in the laserscan
+	// for (int i = 0; i < (length - 1); i++) {
+  //   if (scan->ranges[i] < 8.0 && scan->ranges < 8.0){
+  // 		double x0 = scan->ranges[i] * cos(i*increment);
+  // 		double y0 = scan->ranges[i] * sin(i*increment);
+  // 		double x1 = scan->ranges[i+1] * cos((i+1)*increment);
+  // 		double y1 = scan->ranges[i+1] * sin((i+1)*increment);
+  //
+  // 		Vector temp;
+  // 		temp.x = x1 - x0;
+  // 		temp.y = y1 - y0;
+  // 		temp.i = i;
+  // 		temp.distance = scan->ranges[i];
+  // 		temp.slope = fabs(atan2(temp.y,temp.x));
+  // 		gradients.push_back(temp);
+  //   }
+	// }
+  //
+  // double grad_ave_a = 0;
+	// double grad_ave_b = 0;
+	// int k = 10;
+  // std::vector<POI> first_tier;
+	// //Find the average gradient over span of 20 points for each point in Laserscan
+	// while (k < (gradients.size() - 10)) {
+	// 	for (int j = -10; j < 10; j++) {
+	// 	    if(j < 0)
+	// 	        grad_ave_a +=gradients[k+j].slope;
+	// 	    else
+	// 	        grad_ave_b +=gradients[k+j].slope;
+	// 	}
+	// 	grad_ave_a = grad_ave_a/10;
+	// 	grad_ave_b = grad_ave_b/10;
+  //
+	// 	if((fabs(grad_ave_a - grad_ave_b) < gradient_threshold)){
+	// 	    POI temp;
+	// 	    temp.index = gradients[k].i; // temp.angle = i;
+	// 	    temp.distance = gradients[k].distance;
+	// 	    temp.type = 1;
+  //
+	// 	    first_tier.push_back(temp);
+	// 	}
+	// 	k++;
+	// }
+  //
+  // int obsfront = 0;
+  // bool frontClear = false;  // flag for checking if front is clear or not
+  // bool frontedge = false;  // edges are the traversible but the come up as obstacles in lidar
+  //
+  // for (int i = 40; i < 60; i++){
+  //   if (scan->ranges[i] < 8.0){
+  //     obsfront += 1;
+  //   }
+  // }
+  //
+  // if(obsfront < 5){
+  //   frontClear = true;
+  // }
+  //
+  // for (int i=0; i < first_tier.size(); i++){
+  //   if (first_tier[i].index == 50){
+  //     frontedge = true;
+  //   }
+  // }
+
+  //add the avoidance stuff here
+
+
+  // std::vector <double> angles;
+  // for(int i=0; i<90; i++){
+  //   double gradient = 0.0;
+  //   for(int j=0; j<9; j++){
+  //     if (i+j <= 99){
+  //       gradient += std::abs(scan->ranges[i+j] - scan->ranges[i+j+1]);
+  //     }
+  //   }
+  //   if (gradient < threshold){
+  //     double direction = (i+5)*(-0.0262626260519);
+  //     angles.pushback(direction);
+  //   }
+  // }
+
   int c = 50;
   float right[50];
   float left[50];
@@ -80,7 +184,7 @@ void lidar_clud(const sensor_msgs::LaserScan::ConstPtr& scan)
         // cout<<dir.data<<endl;
         // cout<<idr<<endl;
       }
-      else 
+      else
       {
         float lmax = scan->ranges[50];
         int idl=0;
@@ -116,11 +220,11 @@ int main(int argc, char **argv){
   ros::NodeHandle nh("");
 
   ros::Subscriber lidar = nh.subscribe<sensor_msgs::LaserScan>("laser/scan",1, lidar_clud);
-  ros::Publisher directionr = nh.advertise<std_msgs::Float64>("driving/direction",1000);
+  ros::Publisher directionr = nh.advertise<std_msgs::Float64>("direction",1000);
 
   ros::Rate rate(100);
 
-  while (ros::ok()) 
+  while (ros::ok())
   {
     directionr.publish(dir);
     cclose = false;
@@ -130,3 +234,40 @@ int main(int argc, char **argv){
 
   return 0;
 }
+// cout << "range front "<<scan->ranges[50]<<endl;
+// int sections{10};
+//
+// typedef struct{
+//   int index;    //index of the section [1-5] or[0-4]
+//   int start;    // index of the starting data point in that section
+//   std::vector<double> range;     //vector of ranges of all data points in the section
+//   std::vector<int> obsindex;  // vector of suspected obstacles in the section
+//   double gradient;   // change in the range between successive suspected obstacles
+//   int numobs;        // number of suspected obstacles
+// } section;
+//
+//
+// // Initialize all sections:
+// std::vector<section> sections(5);
+// int k = 0;
+// for(int i=0; i<100; i++){
+//   if (i%20 == 0){
+//     section sect;
+//     sect.index = k;
+//     sect.start = i;
+//     sect.gradient = 0.0;
+//     sect.numobs = 0;
+//     for (int j=0; j < 20; j++){
+//       sect.range.push_back(scan->ranges[i+j]);
+//       if(scan->ranges[i+j] < 8.0){
+//         sect.numobs += 1;
+//         sect.obsindex.pushback(i+j);
+//       }
+//     }
+//     k+=1;
+//     sections.push_back(sect);
+//   }
+// }
+
+//compare the sections, take the section with the least number of obstacle and
+// with the direction closest to the goal direction

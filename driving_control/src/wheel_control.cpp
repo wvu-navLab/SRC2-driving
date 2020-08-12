@@ -15,11 +15,9 @@
 WheelControl::WheelControl(ros::NodeHandle & nh)
 : nh_(nh)
 {
-    // Subscribers
     subJointStates = nh_.subscribe("joint_states", 1000, &WheelControl::jointStatesCallback, this);
-    subWheelVelCmds = nh_.subscribe("driving/wheel_vel_cmds", 1000, &WheelControl::wheelVelCmdsCallback, this);
-    // Publishers
-    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 1000);
+    subWheelVelCmds = nh_.subscribe("wheel_vel_cmds", 1000, &WheelControl::wheelVelCmdsCallback, this);
+    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
 }
 
 void WheelControl::wheelVelCmdsCallback(const driving_control::WheelVelCmds::ConstPtr &msg)
@@ -40,23 +38,23 @@ void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &
     int br_wheel_joint_idx;
     int fl_wheel_joint_idx;
     int bl_wheel_joint_idx;
-
+    
     //get robot name
-    for(int i=0; i<msg->name.size(); i++)
+    for(int i=0; i<msg->name.size(); i++) 
     {
-        if(msg->name[i] == "fr_wheel_joint")
+        if(msg->name[i] == "fr_wheel_joint") 
         {
             fr_wheel_joint_idx = i;
         }
-        if(msg->name[i] == "br_wheel_joint")
+        if(msg->name[i] == "br_wheel_joint") 
         {
             br_wheel_joint_idx = i;
         }
-        if(msg->name[i] == "fl_wheel_joint")
+        if(msg->name[i] == "fl_wheel_joint") 
         {
             fl_wheel_joint_idx = i;
         }
-        if(msg->name[i] == "bl_wheel_joint")
+        if(msg->name[i] == "bl_wheel_joint") 
         {
             bl_wheel_joint_idx = i;
         }
@@ -76,7 +74,7 @@ void WheelControl::controlMotors()
 
     // See https://bitbucket.org/AndyZe/pid/src/master/src/pid.cpp
     // for a better implementation
-
+        
     double m1 = Kp_*(w1_cmd_ - w1_current_);
     double m2 = Kp_*(w2_cmd_ - w2_current_);
     double m3 = Kp_*(w3_cmd_ - w3_current_);
@@ -84,9 +82,9 @@ void WheelControl::controlMotors()
 
     motion_control::MotorGroup m;
 
-    m.m1 = m1;
-    m.m2 = m2;
-    m.m3 = m3;
+    m.m1 = m1; 
+    m.m2 = m2; 
+    m.m3 = m3; 
     m.m4 = m4;
 
     pubMotorEfforts.publish(m);
@@ -111,7 +109,7 @@ int main(int argc, char **argv)
     ROS_INFO("Wheel Velocity Controller initializing...");
     WheelControl wheel_control(nh);
 
-    while(ros::ok())
+    while(ros::ok()) 
     {
         wheel_control.controlMotors();
         ros::spinOnce();

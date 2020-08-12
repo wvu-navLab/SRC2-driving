@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   message_generation
   srcp2_msgs
-  message_runtime
 )
 
 ## System dependencies are found with CMake's conventions
@@ -130,11 +129,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/cmd_joints.cpp
-#   src/cmd_sensor.cpp
-#   src/cmd_bin.cpp
-#   src/cmd_motors.cpp
-#   src/cmd_steering.cpp
+#   src/${PROJECT_NAME}/motion_control.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -177,7 +172,25 @@ add_dependencies(cmd_steering motion_control_generate_messages_cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+target_link_libraries(cmd_sensor
+  ${catkin_LIBRARIES}
+)
 
+target_link_libraries(cmd_bin
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(cmd_joints
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(cmd_motors
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(cmd_steering
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

@@ -15,83 +15,33 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
     : nh_(nh)
 {
     // Subscriber
-    subOdom = nh_.subscribe("localization/odometry/sensor_fusion", 10, &WaypointNavigation::odometryCallback, this);
-    subSmach = nh_.subscribe("state_machine/state", 10, &WaypointNavigation::smachCallback, this);
-    subAvoidDirection = nh_.subscribe("driving/direction", 10, &WaypointNavigation::avoidObstacleCallback, this);
+    //subOdom = nh_.subscribe("dead_reckoning/odometry", 1, &WaypointNavigation::odometryCallback, this);
+    subOdomTruth = nh_.subscribe("odometry/truth", 1, &WaypointNavigation::odometryTruthCallback, this);
+    subGoal = nh_.subscribe("navigation/goal_pos", 1, &WaypointNavigation::goalCallback, this);
+    subAvoidDirection = nh_.subscribe("direction", 100, &WaypointNavigation::avoidObstacleCallback, this);
 
     // Publisher
-    pubCmdVel = nh_.advertise<geometry_msgs::Twist>("driving/cmd_vel", 10);
-    pubNavStatus = nh_.advertise<std_msgs::Int64>("navigation/status", 10);
-    pubWaypointUnreachable = nh_.advertise<std_msgs::Bool>("state_machine/waypoint_unreachable", 10);
-    pubArrivedAtWaypoint = nh_.advertise<std_msgs::Bool>("state_machine/arrived_at_waypoint", 10);
-
-    // Service Servers
-    srv_set_goal_ = nh_.advertiseService("navigation/set_goal", &WaypointNavigation::setGoal, this);
-    srv_interrupt_ = nh_.advertiseService("navigation/interrupt", &WaypointNavigation::interrupt, this);
-
+    pubCmdVel = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
 }
 
-void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
+void WaypointNavigation::odometryTruthCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
-    if (firstOdom_ == false)
-    {
-        firstOdom_ = true;
-    }
     localPos_curr_ = msg->pose.pose;
     localVel_curr_ = msg->twist.twist;
+    // ROS_INFO_STREAM("odometryTruth"<<localPos_curr_);
+
 }
 
-bool WaypointNavigation::interrupt(waypoint_nav::Interrupt::Request &req, waypoint_nav::Interrupt::Response &res)
+// void WaypointNavigation::odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
+// {
+//     localPos_curr_ = msg->pose.pose;
+//     localVel_curr_ = msg->twist.twist;
+// }
+
+void WaypointNavigation::goalCallback(const geometry_msgs::Pose& msg)
 {
-    if (req.interrupt == true)
-    {
-        geometry_msgs::Twist cmd_vel;
-
-        active_ = false;
-        cmd_vel.linear.x = 0.0;
-        cmd_vel.linear.y = 0.0;
-        cmd_vel.linear.z = 0.0;
-        cmd_vel.angular.x = 0.0;
-        cmd_vel.angular.y = 0.0;
-        cmd_vel.angular.z = 0.0;
-        pubCmdVel.publish(cmd_vel);
-        ROS_INFO_STREAM("WAYPOINT NAV INTERRUPT");
-    }
-    else
-    {
-        active_ = true;
-    }
-    res.success = true;
-    return true;
-}
-
-bool WaypointNavigation::setGoal(waypoint_nav::SetGoal::Request &req, waypoint_nav::SetGoal::Response &res)
-{
-    if (req.start == true)
-    {
-        if (firstGoal_ == false)
-        {
-            firstGoal_ = true;
-        }
-
-        goalPos_ = req.goal;
-        // ROS_INFO_STREAM("New goal "<< goalPos_);
-        res.success = false;
-    }
-    else
-    {
-        goalPos_ = localPos_curr_;
-        res.success = false;
-    }
-    return true;
-}
-
-void WaypointNavigation::smachCallback(const std_msgs::Int64::ConstPtr & msg)
-{
-    if (msg->data == TRAV_STATE)
-    {
-        active_ = true;
-    }
+    goalPos_ = msg;
+    ROS_INFO_STREAM("New goal "<<goalPos_);
 }
 
 void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr& msg)
@@ -125,9 +75,6 @@ void WaypointNavigation::avoidObstacleCallback(const std_msgs::Float64::ConstPtr
 
 void WaypointNavigation::commandVelocity()
 {
-    std_msgs::Int64 status;
-    std_msgs::Bool arrived;
-    std_msgs::Bool unreachable;
     geometry_msgs::Twist cmd_vel;
     double ex, ey, et, ephi, phi_d;
     double vd, vFB, ev;
@@ -147,10 +94,6 @@ void WaypointNavigation::commandVelocity()
     ex = goalPos_.position.x - localPos_curr_.position.x;
     ey = goalPos_.position.y - localPos_curr_.position.y;
     pf = std::hypot(ex, ey);
-    // ROS_INFO_STREAM("error:"<<pf);
-    // ROS_INFO_STREAM("goalPos_.position"<<goalPos_);
-    // ROS_INFO_STREAM("localPos_curr_.position"<<localPos_curr_);
-    // ROS_INFO_STREAM("yaw: "<<yaw);
 
     vd = 1.5;
     // if (vd<1)
@@ -164,11 +107,8 @@ void WaypointNavigation::commandVelocity()
     if (pf > 0.2)
     {
         phi_d = atan2(ey,ex);
-
-        // ROS_INFO_STREAM("phi_d: "<<phi_d);
         ephi = phi_d - yaw;
         et = atan2(sin(ephi), cos(ephi));
-        // ROS_INFO_STREAM("et: "<<et);
 
         if (signbit(et) == 1)
         {
@@ -220,8 +160,6 @@ void WaypointNavigation::commandVelocity()
             cmd_vel.angular.z = 0.0;
             // ROS_INFO_STREAM("Crab motion");
         }
-        status.data = GOING;
-        arrived.data = false;
     }
     else
     {
@@ -231,21 +169,9 @@ void WaypointNavigation::commandVelocity()
         cmd_vel.angular.x = 0.0;
         cmd_vel.angular.y = 0.0;
         cmd_vel.angular.z = 0.0;
-
-        status.data = ARRIVED;
-        arrived.data = true;
     }
     // ROS_INFO_STREAM("Commanded vel" << cmd_vel);
-
-    unreachable.data = false;
-
-    if (firstGoal_ && firstOdom_)
-    {
-        pubCmdVel.publish(cmd_vel);
-        pubNavStatus.publish(status);
-        pubArrivedAtWaypoint.publish(arrived);
-        pubWaypointUnreachable.publish(unreachable);
-    }
+    pubCmdVel.publish(cmd_vel);
 }
 
 /*!
@@ -261,7 +187,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "waypoint_nav");
     ros::NodeHandle nh("");
 
-    ros::Rate rate(100);
+    ros::Rate rate(300);
 
     ROS_INFO("Waypoint Nav Node initializing...");
     WaypointNavigation waypoint_nav(nh);
@@ -269,12 +195,7 @@ int main(int argc, char **argv)
 
     while(ros::ok())
     {
-        if (waypoint_nav.active_ == true)
-        {
-            waypoint_nav.commandVelocity();
-        }
-        // ROS_INFO_THROTTLE(1,"active_%d",waypoint_nav.active_);
-
+        waypoint_nav.commandVelocity();
         ros::spinOnce();
         rate.sleep();
     }

@@ -11,7 +11,7 @@ JointsCommander::JointsCommander(ros::NodeHandle & nh)
   
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("driving/arm_joint_angles", 1000, &JointsCommander::messageCallback, this);
+  sub_ = nh_.subscribe("arm_joint_angles", 1000, &JointsCommander::messageCallback, this);
 
   // Node publishes individual joint positions
   pub1_ = nh_.advertise<std_msgs::Float64>("mount_joint_controller/command", 1000);

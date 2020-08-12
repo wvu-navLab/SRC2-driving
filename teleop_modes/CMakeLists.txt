@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 2.8.3)
 project(teleop_modes)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -12,8 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   motion_control
+  message_generation
   srcp2_msgs
-  message_runtime
 )
 
 ## System dependencies are found with CMake's conventions
@@ -107,8 +107,8 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES motion_control
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control 
+  LIBRARIES motion_control
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 

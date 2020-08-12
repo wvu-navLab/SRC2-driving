@@ -58,11 +58,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  SetGoal.srv
-  Interrupt.srv
-)
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,13 +72,13 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-  sensor_msgs
-  nav_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+#   sensor_msgs
+#   nav_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -150,11 +150,7 @@ target_link_libraries(avoidance_lidar ${catkin_LIBRARIES})
 
 add_executable(waypoint_nav src/waypoint_nav.cpp)
 target_link_libraries(waypoint_nav ${catkin_LIBRARIES})
-add_dependencies(waypoint_nav waypoint_nav_generate_messages_cpp)
-
-add_executable(imu_rpy_noise src/imu_rpy_noise.cpp)
-target_link_libraries(imu_rpy_noise ${catkin_LIBRARIES})
-# add_dependencies(imu_rpy_noise waypoint_nav_generate_messages_cpp)
+# add_dependencies(waypoint_nav waypoint_nav_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -176,10 +172,6 @@ target_link_libraries(avoidance_lidar
 )
 
 target_link_libraries(waypoint_nav 
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(imu_rpy_noise 
   ${catkin_LIBRARIES}
 )
 

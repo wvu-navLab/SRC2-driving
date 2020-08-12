@@ -10,7 +10,7 @@ MotorsCommander::MotorsCommander(ros::NodeHandle & nh)
 {      
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("driving/motor_efforts", 1000, &MotorsCommander::messageCallback, this);
+  sub_ = nh_.subscribe("motor_efforts", 1000, &MotorsCommander::messageCallback, this);
 
   // Node publishes individual joint positions
   pub1_ = nh_.advertise<std_msgs::Float64>("fr_wheel_controller/command", 1000);

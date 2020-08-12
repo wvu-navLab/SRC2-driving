@@ -25,17 +25,12 @@
 #include <realtime_tools/realtime_publisher.h>
 
 // Custom message includes. Auto-generated from msg/ directory.
-#include <std_msgs/Int64.h>
 #include <geometry_msgs/Twist.h>
 #include <motion_control/SteeringGroup.h>
 #include <driving_control/WheelVelCmds.h>
 #include <driving_tools/Stop.h>
 #include <rosgraph_msgs/Clock.h>
 
-#define STOP_MODE 0
-#define CRAB_MODE 1
-#define DACK_MODE 2
-#define TIPP_MODE 3
 
 // #include <driving_control/speed_limiter.h>
 
@@ -66,7 +61,6 @@ private:
     // Publisher
     ros::Publisher pubWheelVelCmds;
     ros::Publisher pubSteeringAngles;
-    ros::Publisher pubDrivingMode;
 
     // Client
     ros::ServiceClient clientStop;
@@ -117,7 +111,6 @@ private:
     double joint_state_controller_publish_rate_;
     double max_velocity_;
 
-    int driving_mode_;
     // /// Speed limiters:
     // CommandTwist last1_cmd_;
     // CommandTwist last0_cmd_;
