@@ -55,7 +55,7 @@ bool WaypointNavigation::interrupt(waypoint_nav::Interrupt::Request &req, waypoi
         cmd_vel.angular.y = 0.0;
         cmd_vel.angular.z = 0.0;
         pubCmdVel.publish(cmd_vel);
-        ROS_INFO_STREAM("I got here");
+        ROS_INFO_STREAM("WAYPOINT NAV INTERRUPT");
     }
     else
     {
