@@ -59,13 +59,13 @@ bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Req
 {
   ROS_INFO("Circulate Base Station Service requested.");
   double R = req.radius;
-  double alpha_i = atan2(SEMI_CHASSIS_LENGTH,R-SEMI_CHASSIS_WIDTH);
-  double alpha_o = atan2(SEMI_CHASSIS_LENGTH,R+SEMI_CHASSIS_WIDTH);
+  double alpha_i = atan2(R, SEMI_CHASSIS_WIDTH);
+  double alpha_o = atan2(R+SEMI_CHASSIS_LENGTH, SEMI_CHASSIS_WIDTH);
   // Rotate wheels at 45 deg
-  s1 = alpha_o;
-  s2 = -alpha_o;
+  s1 = - alpha_i;
+  s2 = - alpha_o;
   s3 = alpha_i;
-  s4 = -alpha_i;
+  s4 = alpha_o;
 
   s.s1 = s1;
   s.s2 = s2;
@@ -74,10 +74,10 @@ bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Req
 
   double throttle = req.throttle;
   // Grab the directional data
-  m1 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_WIDTH)/R;
-  m2 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_WIDTH)/R;
-  m3 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_WIDTH)/R;
-  m4 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_WIDTH)/R;
+  m1 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
+  m2 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
+  m3 = - throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
+  m4 = - throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
 
   m.m1 = m1;
   m.m2 = m2;

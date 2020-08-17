@@ -261,7 +261,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "waypoint_nav");
     ros::NodeHandle nh("");
 
-    ros::Rate rate(300);
+    ros::Rate rate(100);
 
     ROS_INFO("Waypoint Nav Node initializing...");
     WaypointNavigation waypoint_nav(nh);
