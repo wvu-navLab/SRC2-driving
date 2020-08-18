@@ -112,6 +112,7 @@ private:
 
     /// Timeout to consider cmd_vel commands old:
     double cmd_vel_timeout_;
+    bool active_cmd_vel_ = false;
 
     /// Extra params 
     double joint_state_controller_publish_rate_;

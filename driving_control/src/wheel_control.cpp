@@ -16,10 +16,10 @@ WheelControl::WheelControl(ros::NodeHandle & nh)
 : nh_(nh)
 {
     // Subscribers
-    subJointStates = nh_.subscribe("joint_states", 1000, &WheelControl::jointStatesCallback, this);
-    subWheelVelCmds = nh_.subscribe("driving/wheel_vel_cmds", 1000, &WheelControl::wheelVelCmdsCallback, this);
+    subJointStates = nh_.subscribe("joint_states", 10, &WheelControl::jointStatesCallback, this);
+    subWheelVelCmds = nh_.subscribe("driving/wheel_vel_cmds", 10, &WheelControl::wheelVelCmdsCallback, this);
     // Publishers
-    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 1000);
+    pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 10);
 }
 
 void WheelControl::wheelVelCmdsCallback(const driving_control::WheelVelCmds::ConstPtr &msg)
@@ -29,7 +29,8 @@ void WheelControl::wheelVelCmdsCallback(const driving_control::WheelVelCmds::Con
     w3_cmd_ = msg->w3;
     w4_cmd_ = msg->w4;
 
-    // new_state_or_setpt_ = true;
+    new_setpt_ = true;
+    last_stpt_time_ = ros::Time::now();
     // ROS_INFO("Joint commands updated.");
     // ROS_INFO_STREAM("Values "<< w1_cmd_<<" "<< w2_cmd_<< " "<< w3_cmd_<< " "<< w4_cmd_);
 }
@@ -71,27 +72,38 @@ void WheelControl::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &
     // ROS_INFO_STREAM("Values "<< w1_current_<<" "<< w2_current_<< " "<< w3_current_<< " "<< w4_current_);
 }
 
-void WheelControl::controlMotors()
+void WheelControl::controlMotors(ros::Time time)
 {
+    if (new_setpt_ == true)
+    {
+        const double dt = (time.toSec() - last_stpt_time_.toSec());
 
-    // See https://bitbucket.org/AndyZe/pid/src/master/src/pid.cpp
-    // for a better implementation
+         // Brake if cmd_vel has timeout:
+        if (dt > cmd_vel_timeout_)
+        {
+            new_setpt_ = false;
+            ROS_INFO_STREAM("Active: " << new_setpt_);
+        }
+        // See https://bitbucket.org/AndyZe/pid/src/master/src/pid.cpp
+        // for a better implementation
 
-    double m1 = Kp_*(w1_cmd_ - w1_current_);
-    double m2 = Kp_*(w2_cmd_ - w2_current_);
-    double m3 = Kp_*(w3_cmd_ - w3_current_);
-    double m4 = Kp_*(w4_cmd_ - w4_current_);
+        double m1 = Kp_*(w1_cmd_ - w1_current_);
+        double m2 = Kp_*(w2_cmd_ - w2_current_);
+        double m3 = Kp_*(w3_cmd_ - w3_current_);
+        double m4 = Kp_*(w4_cmd_ - w4_current_);
 
-    motion_control::MotorGroup m;
+        motion_control::MotorGroup m;
 
-    m.m1 = m1;
-    m.m2 = m2;
-    m.m3 = m3;
-    m.m4 = m4;
+        m.m1 = m1;
+        m.m2 = m2;
+        m.m3 = m3;
+        m.m4 = m4;
 
-    pubMotorEfforts.publish(m);
-    // ROS_INFO("Motor efforts published.");
-    // ROS_INFO_STREAM("Values "<< m1<<" "<< m2<< " "<< m3<< " "<< m4);
+        pubMotorEfforts.publish(m);
+        // ROS_INFO("Motor efforts published.");
+        // ROS_INFO_STREAM("Values "<< m1<<" "<< m2<< " "<< m3<< " "<< m4);
+    }
+    
 }
 
 /*!
@@ -111,9 +123,13 @@ int main(int argc, char **argv)
     ROS_INFO("Wheel Velocity Controller initializing...");
     WheelControl wheel_control(nh);
 
+    ros::Time loop_time;
+
     while(ros::ok())
     {
-        wheel_control.controlMotors();
+        loop_time = ros::Time::now();
+
+        wheel_control.controlMotors(loop_time);
         ros::spinOnce();
         rate.sleep();
     }

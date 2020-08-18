@@ -51,7 +51,7 @@ bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, dri
   pubMotorEfforts.publish(m);
   pubSteeringEfforts.publish(s);
 
-  res.success = 0;
+  res.success = true;
   return true;
 }
 
@@ -87,7 +87,7 @@ bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Req
   pubMotorEfforts.publish(m);
   pubSteeringEfforts.publish(s);
 
-  res.success = 0;
+  res.success = true;
   return true;
 }
 
@@ -128,7 +128,7 @@ bool DrivingTools::Stop(driving_tools::Stop::Request  &req, driving_tools::Stop:
 {
   if (req.enableStop)
   {
-    ROS_INFO("Stop Service request received.");
+    ROS_INFO("Stop Service requested.");
 
     s.s1 = 0;
     s.s2 = 0;
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "driving_tools");
 
   DrivingTools driving_tools;
-  ROS_INFO("Ready to activate driving modes.");
+  ROS_INFO("Driving tools node initialized.");
   
   ros::spin();
 

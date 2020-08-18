@@ -59,8 +59,10 @@ private:
 public:
     WheelControl(ros::NodeHandle & nh);
 
-    void controlMotors();
-
+    void controlMotors(ros::Time time);
+    bool new_setpt_ = false;
+    ros::Time last_stpt_time_;
+    double cmd_vel_timeout_ = 1.0;
 };
 
 

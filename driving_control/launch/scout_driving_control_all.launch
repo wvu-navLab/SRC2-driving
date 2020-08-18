@@ -1,4 +1,9 @@
 <launch> 
+  <!-- scout_motion_control launch file -->
+  <include file="$(find motion_control)/launch/scout_motion_control.launch"/>
+
+  <!-- scout_driving_tools launch file -->
+  <include file="$(find driving_tools)/launch/scout_driving_tools.launch"/>
 
   <group ns="scout_1">
 
