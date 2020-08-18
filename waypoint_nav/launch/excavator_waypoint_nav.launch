@@ -1,11 +1,11 @@
-<launch> 
+<launch>
   <!-- excavator_driving_tools launch file -->
-  <include file="$(find driving_control)/launch/excavator_driving_control.launch"/>
+  
 
   <group ns="excavator_1">
 
     <param name="/use_sim_time" value="true"/>
-    
+
     <node pkg="waypoint_nav"
           name="waypoint_nav"
           type="waypoint_nav"
