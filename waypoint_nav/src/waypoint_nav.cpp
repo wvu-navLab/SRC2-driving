@@ -153,6 +153,7 @@ void WaypointNavigation::commandVelocity()
     // ROS_INFO_STREAM("yaw: "<<yaw);
 
     vd = 1.5;
+    // vd = 0.4;
     // if (vd<1)
     // {
     //     vd=2;
