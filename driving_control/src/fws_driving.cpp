@@ -127,10 +127,10 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
 
         if(enable_twist_cmd_ == true)
         {
-            if (fabs(curr_cmd_twist.lin_x)<0.15 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.lin_y)<0.001)
-            {
-                curr_cmd_twist.lin_x = 0;
-            }
+            // if (fabs(curr_cmd_twist.lin_x)<0.15 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.lin_y)<0.001)
+            // {
+            //     curr_cmd_twist.lin_x = 0;
+            // }
             
             bool vx_flag = (fabs(curr_cmd_twist.lin_x) > 0.001);
             bool vy_flag = (fabs(curr_cmd_twist.lin_y) > 0.001);
@@ -187,18 +187,18 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
                 }
 
                 // Compute steering angles
-                if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
-                {
-                    front_left_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
-                                                (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
-                    front_right_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
-                                                (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
-                }
-                else if(fabs(curr_cmd_twist.lin_x) > 0.001)
-                {
-                    front_left_steering = copysign(M_PI_2, curr_cmd_twist.ang);
-                    front_right_steering = copysign(M_PI_2, curr_cmd_twist.ang);
-                }
+                // if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
+                // {
+                front_left_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
+                front_right_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
+                // }
+                // else
+                // {
+                //     front_left_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
+                //                                 (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
+                //     front_right_steering = -atan(curr_cmd_twist.ang*wheel_separation_length_ /
+                //                                 (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
+                // }
                 rear_left_steering = -front_left_steering;
                 rear_right_steering = -front_right_steering;
             }
