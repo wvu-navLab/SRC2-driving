@@ -4,9 +4,9 @@
  *
  * Four wheel steering driving (...).
  *
- * Adapted from four_wheel_steering_controller.cpp 
+ * Adapted from four_wheel_steering_controller.cpp
  * https://github.com/ros-controls/ros_controllers/blob/noetic-devel/four_wheel_steering_controller/src/four_wheel_steering_controller.cpp
- * 
+ *
  * \author Bernardo Martinez Rocamora Junior, WVU - bm00002@mix.wvu.edu
  * \author Chris Tatsch, WVU - ca0055@mix.wvu.edu
  * \date June 01, 2020
@@ -60,7 +60,7 @@ void FourWheelSteeringDriving::starting(const ros::Time& time)
 }
 
 void FourWheelSteeringDriving::stopping(const ros::Time& time)
-{    
+{
     ROS_INFO("Stopping.");
     brake();
 }
@@ -128,22 +128,22 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
 
         if(enable_twist_cmd_ == true)
         {
-	    bool condition = false;
-            if (fabs(curr_cmd_twist.lin_x)<0.101 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.ang) > .1 && fabs(curr_cmd_twist.lin_y)<0.01)
-            {
-		condition = true;
-               // curr_cmd_twist.lin_x = 0.0;
-		//curr_cmd_twist.lin_y = 0.0;
-		// curr_cmd_twist.ang = curr_cmd_twist.ang*2;
-            }
-            
+	  //   bool condition = false;
+    //         if (fabs(curr_cmd_twist.lin_x)<0.101 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.ang) > .1 && fabs(curr_cmd_twist.lin_y)<0.01)
+    //         {
+		// condition = true;
+    //            // curr_cmd_twist.lin_x = 0.0;
+		// //curr_cmd_twist.lin_y = 0.0;
+		// // curr_cmd_twist.ang = curr_cmd_twist.ang*2;
+    //         }
+    //
             bool vx_flag = (fabs(curr_cmd_twist.lin_x) > 0.001);
             bool vy_flag = (fabs(curr_cmd_twist.lin_y) > 0.001);
             bool wz_flag = (fabs(curr_cmd_twist.ang) > 0.001);
 
             if (wz_flag && !vx_flag && !vy_flag) // Turn-in-place Driving
             {
-		 
+
 		//if(condition) ROS_WARN("Rotate in Place due to odd condition");
                 driving_mode_ = TIPP_MODE;
                 vel_right_front = curr_cmd_twist.ang * std::hypot(wheel_separation_length_,steering_track) / (2 * wheel_radius_);
@@ -155,7 +155,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
                 rear_right_steering = -front_right_steering;
                 front_left_steering = -front_right_steering;
                 rear_left_steering = front_right_steering;
-            } 
+            }
             else if (vx_flag && vy_flag && !wz_flag) // All-Wheel Driving (crab motion)
             {
                 driving_mode_ = CRAB_MODE;
@@ -251,7 +251,7 @@ int main(int argc, char **argv)
 
     // This should be set in launch files as well
     nh.setParam("/use_sim_time", true);
-    
+
     ROS_INFO("Four Wheel Steering Driving Node initializing...");
     FourWheelSteeringDriving fws_driving(nh);
 
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 
     // fws_driving.starting(internal_time);
 
-    while(ros::ok()) 
+    while(ros::ok())
     {
         loop_time = ros::Time::now();
         fws_driving.updateCommand(loop_time, dt);
