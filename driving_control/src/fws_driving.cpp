@@ -42,12 +42,12 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     clientStop = nh_.serviceClient<driving_tools::Stop>("stop");
 
     // Subscribers
-    subCmdVel = nh_.subscribe("driving/cmd_vel", 10, &FourWheelSteeringDriving::cmdVelCallback, this);
+    subCmdVel = nh_.subscribe("driving/cmd_vel", 1, &FourWheelSteeringDriving::cmdVelCallback, this);
 
     // Publishers
-    pubWheelVelCmds = nh_.advertise<driving_control::WheelVelCmds>("driving/wheel_vel_cmds", 10);
-    pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("driving/steering_joint_angles", 10);
-    pubDrivingMode = nh_.advertise<std_msgs::Int64>("driving/driving_mode", 10);
+    pubWheelVelCmds = nh_.advertise<driving_control::WheelVelCmds>("driving/wheel_vel_cmds", 1);
+    pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("driving/steering_joint_angles", 1);
+    pubDrivingMode = nh_.advertise<std_msgs::Int64>("driving/driving_mode", 1);
 
 
     ROS_INFO_STREAM("cmd stamp:"<<command_struct_twist_.stamp);
@@ -109,12 +109,13 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
         // Brake if cmd_vel has timeout:
         if (dt > cmd_vel_timeout_)
         {
+            ROS_WARN("Cmd Vel Timeout");
             driving_mode_ = STOP_MODE;
             curr_cmd_twist.lin_x = 0.0;
             curr_cmd_twist.lin_y = 0.0;
             curr_cmd_twist.ang = 0.0;
             active_cmd_vel_ = false;
-            // ROS_INFO_STREAM("Active: " << active_cmd_vel_);
+            ROS_INFO_STREAM("Active: " << active_cmd_vel_);
         }
 
         const double cmd_dt(period.toSec());
@@ -127,9 +128,13 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
 
         if(enable_twist_cmd_ == true)
         {
-            if (fabs(curr_cmd_twist.lin_x)<0.15 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.lin_y)<0.001)
+	    bool condition = false;
+            if (fabs(curr_cmd_twist.lin_x)<0.101 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.ang) > .1 && fabs(curr_cmd_twist.lin_y)<0.01)
             {
-                curr_cmd_twist.lin_x = 0;
+		condition = true;
+               // curr_cmd_twist.lin_x = 0.0;
+		//curr_cmd_twist.lin_y = 0.0;
+		// curr_cmd_twist.ang = curr_cmd_twist.ang*2;
             }
             
             bool vx_flag = (fabs(curr_cmd_twist.lin_x) > 0.001);
@@ -138,6 +143,8 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
 
             if (wz_flag && !vx_flag && !vy_flag) // Turn-in-place Driving
             {
+		 
+		//if(condition) ROS_WARN("Rotate in Place due to odd condition");
                 driving_mode_ = TIPP_MODE;
                 vel_right_front = curr_cmd_twist.ang * std::hypot(wheel_separation_length_,steering_track) / (2 * wheel_radius_);
                 vel_right_rear = vel_right_front;
@@ -187,18 +194,18 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
                 }
 
                 // Compute steering angles
-                if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
-                {
+              //  if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
+              //  {
                     front_left_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
                                                 (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
                     front_right_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
                                                 (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
-                }
-                else if(fabs(curr_cmd_twist.lin_x) > 0.001)
-                {
-                    front_left_steering = copysign(M_PI_2, curr_cmd_twist.ang);
-                    front_right_steering = copysign(M_PI_2, curr_cmd_twist.ang);
-                }
+               // }
+               // else if(fabs(curr_cmd_twist.lin_x) > 0.001)
+               // {
+                 //   front_left_steering = copysign(M_PI_2, curr_cmd_twist.ang);
+                  //  front_right_steering = copysign(M_PI_2, curr_cmd_twist.ang);
+               // }
                 rear_left_steering = -front_left_steering;
                 rear_right_steering = -front_right_steering;
             }
@@ -250,7 +257,7 @@ int main(int argc, char **argv)
 
     ros::Time loop_time = ros::Time::now();
     const ros::Duration dt = fws_driving.getPeriod();
-    ros::Rate rate(20);
+    ros::Rate rate(50);
 
 
     ROS_WARN_STREAM("Period: " << dt.toSec());
