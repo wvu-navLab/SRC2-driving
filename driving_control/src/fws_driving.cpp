@@ -110,7 +110,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
         if (dt > cmd_vel_timeout_)
         {
             ROS_WARN("Cmd Vel Timeout");
-            driving_mode_ = STOP_MODE;
+            driving_mode_ = INACTIVE_MODE;
             curr_cmd_twist.lin_x = 0.0;
             curr_cmd_twist.lin_y = 0.0;
             curr_cmd_twist.ang = 0.0;
@@ -125,18 +125,18 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
         double vel_left_rear = 0, vel_right_rear = 0;
         double front_left_steering = 0, front_right_steering = 0;
         double rear_left_steering = 0, rear_right_steering = 0;
-
-        if(enable_twist_cmd_ == true)
-        {
+    //
+         if(enable_twist_cmd_ == true)
+         {
 	  //   bool condition = false;
     //         if (fabs(curr_cmd_twist.lin_x)<0.101 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.ang) > .1 && fabs(curr_cmd_twist.lin_y)<0.01)
     //         {
 		// condition = true;
-    //            // curr_cmd_twist.lin_x = 0.0;
-		// //curr_cmd_twist.lin_y = 0.0;
-		// // curr_cmd_twist.ang = curr_cmd_twist.ang*2;
-    //         }
-    //
+    //            curr_cmd_twist.lin_x = 0.0;
+		// curr_cmd_twist.lin_y = 0.0;
+		// curr_cmd_twist.ang = curr_cmd_twist.ang*2;
+    //       }
+
             bool vx_flag = (fabs(curr_cmd_twist.lin_x) > 0.001);
             bool vy_flag = (fabs(curr_cmd_twist.lin_y) > 0.001);
             bool wz_flag = (fabs(curr_cmd_twist.ang) > 0.001);
@@ -144,7 +144,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
             if (wz_flag && !vx_flag && !vy_flag) // Turn-in-place Driving
             {
 
-		//if(condition) ROS_WARN("Rotate in Place due to odd condition");
+		            // if(condition) ROS_WARN("Rotate in Place due to odd condition");
                 driving_mode_ = TIPP_MODE;
                 vel_right_front = curr_cmd_twist.ang * std::hypot(wheel_separation_length_,steering_track) / (2 * wheel_radius_);
                 vel_right_rear = vel_right_front;

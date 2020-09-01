@@ -14,7 +14,7 @@
 
 // Include cpp important headers
 #include <math.h>
-#include <stdio.h> 
+#include <stdio.h>
 #include <chrono>
 #include <thread>
 
@@ -36,6 +36,7 @@
 #define CRAB_MODE 1
 #define DACK_MODE 2
 #define TIPP_MODE 3
+#define INACTIVE_MODE 4
 
 // #include <driving_control/speed_limiter.h>
 
@@ -45,7 +46,7 @@ public:
     FourWheelSteeringDriving(ros::NodeHandle & nh);
 
     void starting(const ros::Time& time);
-    
+
     void stopping(const ros::Time& time);
 
     void updateCommand(const ros::Time& time, const ros::Duration& period);
@@ -114,7 +115,7 @@ private:
     double cmd_vel_timeout_;
     bool active_cmd_vel_ = false;
 
-    /// Extra params 
+    /// Extra params
     double joint_state_controller_publish_rate_;
     double max_velocity_;
 
