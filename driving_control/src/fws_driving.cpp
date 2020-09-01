@@ -21,7 +21,7 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     , wheel_steering_y_offset_(0.0)
     , wheel_radius_(0.0)
     , wheel_separation_length_(0.0)
-    , cmd_vel_timeout_(5)
+    , cmd_vel_timeout_(1.0)
     , enable_twist_cmd_(true)
 {
 

@@ -15,7 +15,7 @@
 
 // Include cpp important headers
 #include <math.h>
-#include <stdio.h> 
+#include <stdio.h>
 
 // ROS headers
 #include <ros/ros.h>
@@ -47,7 +47,7 @@ private:
     double w2_current_ = 0.0;
     double w3_current_ = 0.0;
     double w4_current_ = 0.0;
- 
+
     double w1_cmd_ = 0.0;
     double w2_cmd_ = 0.0;
     double w3_cmd_ = 0.0;
@@ -62,7 +62,7 @@ public:
     void controlMotors(ros::Time time);
     bool new_setpt_ = false;
     ros::Time last_stpt_time_;
-    double cmd_vel_timeout_ = 1.0;
+    double cmd_vel_timeout_ = 0.5;
 };
 
 
