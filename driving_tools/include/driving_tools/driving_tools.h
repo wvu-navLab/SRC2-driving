@@ -25,6 +25,7 @@
 #include <driving_tools/RotateInPlace.h>
 #include <driving_tools/CirculateBaseStation.h>
 #include <driving_tools/MoveForward.h>
+#include <std_msgs/Int64.h>
 
 // ConstantsS
 #define PI 3.14159265
@@ -57,6 +58,11 @@
  */
 #define SEMI_CHASSIS_WIDTH 1.5/2
 
+#define STOP_MODE 0
+#define CRAB_MODE 1
+#define DACK_MODE 2
+#define TIPP_MODE 3
+#define INACTIVE_MODE 4
 
 class DrivingTools
 {
@@ -75,11 +81,15 @@ private:
     ros::ServiceServer circBaseStationServer;
     ros::ServiceServer moveForwardServer;
 
+    // Publishers
+    ros::Publisher pubDrivingMode;
+
     // Create output messages
     motion_control::MotorGroup m;       /*!< Publisher of motor efforts */
     motion_control::SteeringGroup s;    /*!< Publisher of steering angles */   
     double s1 = 0; double s2 = 0; double s3 = 0; double s4 = 0;   /*!< Init steering variables */
     double m1 = 0; double m2 = 0; double m3 = 0; double m4 = 0;   /*!< Init driving variables */
+    int driving_mode_;
 
 public:
     DrivingTools();

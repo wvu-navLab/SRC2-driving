@@ -15,6 +15,7 @@ DrivingTools::DrivingTools()
   // Publishers
   pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 1000);
   pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("driving/steering_joint_angles", 1000);
+  pubDrivingMode = nh_.advertise<std_msgs::Int64>("driving/driving_mode", 1);
 
   // Service Servers
   stopServer = nh_.advertiseService("driving/stop", &DrivingTools::Stop, this);
@@ -26,6 +27,8 @@ DrivingTools::DrivingTools()
 bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, driving_tools::RotateInPlace::Response &res)
 {
   ROS_INFO("Rotate-in-Place Service requested.");
+
+  driving_mode_ = TIPP_MODE;
   // Rotate wheels at 45 deg
   s1 = MAX_STEERING_ANGLE/2;
   s2 = -MAX_STEERING_ANGLE/2;
@@ -48,6 +51,9 @@ bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, dri
   m.m3 = m3;
   m.m4 = m4;
 
+  std_msgs::Int64 mode;
+  mode.data = driving_mode_;
+  pubDrivingMode.publish(mode);
   pubMotorEfforts.publish(m);
   pubSteeringEfforts.publish(s);
 
@@ -58,6 +64,7 @@ bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, dri
 bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Request  &req, driving_tools::CirculateBaseStation::Response &res)
 {
   ROS_INFO("Circulate Base Station Service requested.");
+  driving_mode_ = CRAB_MODE;
   double R = req.radius;
   double alpha_i = atan2(R, SEMI_CHASSIS_WIDTH);
   double alpha_o = atan2(R+SEMI_CHASSIS_LENGTH, SEMI_CHASSIS_WIDTH);
@@ -84,15 +91,19 @@ bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Req
   m.m3 = m3;
   m.m4 = m4;
 
+  std_msgs::Int64 mode;
+  mode.data = driving_mode_;
+  pubDrivingMode.publish(mode);
   pubMotorEfforts.publish(m);
   pubSteeringEfforts.publish(s);
-
   res.success = true;
   return true;
 }
 
 bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, driving_tools::MoveForward::Response &res)
 {
+  driving_mode_ = DACK_MODE;
+
   ROS_INFO("Move Forward Service requested.");
   // Rotate wheels at 45 deg
   s1 = 0;
@@ -117,6 +128,9 @@ bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, drivin
   m.m3 = m3;
   m.m4 = m4;
 
+  std_msgs::Int64 mode;
+  mode.data = driving_mode_;
+  pubDrivingMode.publish(mode);
   pubMotorEfforts.publish(m);
   pubSteeringEfforts.publish(s);
 
@@ -126,6 +140,7 @@ bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, drivin
 
 bool DrivingTools::Stop(driving_tools::Stop::Request  &req, driving_tools::Stop::Response &res)
 {
+  driving_mode_ = STOP_MODE;
   if (req.enableStop)
   {
     ROS_INFO("Stop Service requested.");
@@ -140,6 +155,9 @@ bool DrivingTools::Stop(driving_tools::Stop::Request  &req, driving_tools::Stop:
     m.m3 = 0;
     m.m4 = 0;
 
+    std_msgs::Int64 mode;
+    mode.data = driving_mode_;
+    pubDrivingMode.publish(mode);
     pubMotorEfforts.publish(m);
     pubSteeringEfforts.publish(s);
 
