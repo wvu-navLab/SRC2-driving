@@ -63,7 +63,7 @@ bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, dri
 
 bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Request  &req, driving_tools::CirculateBaseStation::Response &res)
 {
-  ROS_INFO("Circulate Base Station Service requested.");
+  // ROS_INFO("Circulate Base Station Service requested.");
   driving_mode_ = CRAB_MODE;
   double R = req.radius;
   double alpha_i = atan2(R, SEMI_CHASSIS_WIDTH);
