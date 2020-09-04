@@ -26,7 +26,7 @@ DrivingTools::DrivingTools()
 
 bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, driving_tools::RotateInPlace::Response &res)
 {
-  ROS_INFO("Rotate-in-Place Service requested.");
+  // ROS_INFO("Rotate-in-Place Service requested.");
 
   driving_mode_ = TIPP_MODE;
   // Rotate wheels at 45 deg
@@ -104,7 +104,7 @@ bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, drivin
 {
   driving_mode_ = DACK_MODE;
 
-  ROS_INFO("Move Forward Service requested.");
+  // ROS_INFO("Move Forward Service requested.");
   // Rotate wheels at 45 deg
   s1 = 0;
   s2 = 0;
@@ -143,7 +143,7 @@ bool DrivingTools::Stop(driving_tools::Stop::Request  &req, driving_tools::Stop:
   driving_mode_ = STOP_MODE;
   if (req.enableStop)
   {
-    ROS_INFO("Stop Service requested.");
+    // ROS_INFO("Stop Service requested.");
 
     s.s1 = 0;
     s.s2 = 0;
