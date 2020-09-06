@@ -143,8 +143,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
 
             if (wz_flag && !vx_flag && !vy_flag) // Turn-in-place Driving
             {
-
-		            // if(condition) ROS_WARN("Rotate in Place due to odd condition");
+                // if(condition) ROS_WARN("Rotate in Place due to odd condition");
                 driving_mode_ = TIPP_MODE;
                 vel_right_front = curr_cmd_twist.ang * std::hypot(wheel_separation_length_,steering_track) / (2 * wheel_radius_);
                 vel_right_rear = vel_right_front;
@@ -155,6 +154,19 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
                 rear_right_steering = -front_right_steering;
                 front_left_steering = -front_right_steering;
                 rear_left_steering = front_right_steering;
+            }
+            else if (!vx_flag && !vy_flag && !wz_flag) // Stop
+            {
+                driving_mode_ = STOP_MODE;
+                vel_right_front = 0;
+                vel_right_rear = 0;
+                vel_left_front  = 0;
+                vel_left_rear = 0;
+
+                front_right_steering = 0;
+                rear_right_steering = 0;
+                front_left_steering = 0;
+                rear_left_steering = 0;                    
             }
             else if (vx_flag && vy_flag && !wz_flag) // All-Wheel Driving (crab motion)
             {
@@ -196,8 +208,9 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
                 // Compute steering angles
                 // if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
                 // {
-                front_left_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
-                front_right_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
+
+                front_left_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*abs(curr_cmd_twist.lin_x) - curr_cmd_twist.ang*steering_track));
+                front_right_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*abs(curr_cmd_twist.lin_x) + curr_cmd_twist.ang*steering_track));
                 // }
                 // else
                 // {
