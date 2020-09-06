@@ -117,130 +117,124 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
             active_cmd_vel_ = false;
             ROS_INFO_STREAM("Active: " << active_cmd_vel_);
         }
+        else
+        {
+            const double cmd_dt(period.toSec());
+            const double steering_track = wheel_separation_width_-2*wheel_steering_y_offset_;
 
-        const double cmd_dt(period.toSec());
-        const double steering_track = wheel_separation_width_-2*wheel_steering_y_offset_;
-
-        double vel_left_front = 0, vel_right_front = 0;
-        double vel_left_rear = 0, vel_right_rear = 0;
-        double front_left_steering = 0, front_right_steering = 0;
-        double rear_left_steering = 0, rear_right_steering = 0;
-    //
-         if(enable_twist_cmd_ == true)
-         {
-	  //   bool condition = false;
-    //         if (fabs(curr_cmd_twist.lin_x)<0.101 && fabs(curr_cmd_twist.ang)<0.35 && fabs(curr_cmd_twist.ang) > .1 && fabs(curr_cmd_twist.lin_y)<0.01)
-    //         {
-		// condition = true;
-    //            curr_cmd_twist.lin_x = 0.0;
-		// curr_cmd_twist.lin_y = 0.0;
-		// curr_cmd_twist.ang = curr_cmd_twist.ang*2;
-    //       }
-
-            bool vx_flag = (fabs(curr_cmd_twist.lin_x) > 0.001);
-            bool vy_flag = (fabs(curr_cmd_twist.lin_y) > 0.001);
-            bool wz_flag = (fabs(curr_cmd_twist.ang) > 0.001);
-
-            if (wz_flag && !vx_flag && !vy_flag) // Turn-in-place Driving
+            double vel_left_front = 0, vel_right_front = 0;
+            double vel_left_rear = 0, vel_right_rear = 0;
+            double front_left_steering = 0, front_right_steering = 0;
+            double rear_left_steering = 0, rear_right_steering = 0;
+            if(enable_twist_cmd_ == true)
             {
-                // if(condition) ROS_WARN("Rotate in Place due to odd condition");
-                driving_mode_ = TIPP_MODE;
-                vel_right_front = curr_cmd_twist.ang * std::hypot(wheel_separation_length_,steering_track) / (2 * wheel_radius_);
-                vel_right_rear = vel_right_front;
-                vel_left_front  = - vel_right_front;
-                vel_left_rear = - vel_right_front;
+            
 
-                front_right_steering = atan(wheel_separation_length_/steering_track);
-                rear_right_steering = -front_right_steering;
-                front_left_steering = -front_right_steering;
-                rear_left_steering = front_right_steering;
-            }
-            else if (!vx_flag && !vy_flag && !wz_flag) // Stop
-            {
-                driving_mode_ = STOP_MODE;
-                vel_right_front = 0;
-                vel_right_rear = 0;
-                vel_left_front  = 0;
-                vel_left_rear = 0;
+                bool vx_flag = (fabs(curr_cmd_twist.lin_x) > 0.001);
+                bool vy_flag = (fabs(curr_cmd_twist.lin_y) > 0.001);
+                bool wz_flag = (fabs(curr_cmd_twist.ang) > 0.001);
 
-                front_right_steering = 0;
-                rear_right_steering = 0;
-                front_left_steering = 0;
-                rear_left_steering = 0;                    
-            }
-            else if (vx_flag && vy_flag && !wz_flag) // All-Wheel Driving (crab motion)
-            {
-                driving_mode_ = CRAB_MODE;
-                const double sign_vx = copysign(1.0, curr_cmd_twist.lin_x);
-                vel_right_front = sign_vx * std::hypot(curr_cmd_twist.lin_y,curr_cmd_twist.lin_x)/ wheel_radius_;
-                vel_right_rear = vel_right_front;
-                vel_left_front = vel_right_front;
-                vel_left_rear = vel_right_front;
-
-                // const double sign_vy = copysign(1.0, curr_cmd_twist.lin_y);
-                front_right_steering = atan(curr_cmd_twist.lin_y/ curr_cmd_twist.lin_x);
-                rear_right_steering = front_right_steering;
-                front_left_steering = front_right_steering;
-                rear_left_steering = front_right_steering;
-            }
-            else // Double Ackermann Driving
-            {
-                driving_mode_ = DACK_MODE;
-                // Compute wheels velocities:
-                if(fabs(curr_cmd_twist.lin_x) > 0.001)
+                if (wz_flag && !vx_flag && !vy_flag) // Turn-in-place Driving
                 {
-                    const double vel_steering_offset = (curr_cmd_twist.ang*wheel_steering_y_offset_)/wheel_radius_;
-                    const double sign = copysign(1.0, curr_cmd_twist.lin_x);
-                    vel_left_front  = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
-                                                        (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                                    - vel_steering_offset;
-                    vel_right_front = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
-                                                        (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                                    + vel_steering_offset;
-                    vel_left_rear = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
-                                                    (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                                    - vel_steering_offset;
-                    vel_right_rear = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
-                                                    (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
-                                    + vel_steering_offset;
+                    // if(condition) ROS_WARN("Rotate in Place due to odd condition");
+                    driving_mode_ = TIPP_MODE;
+                    vel_right_front = curr_cmd_twist.ang * std::hypot(wheel_separation_length_,steering_track) / (2 * wheel_radius_);
+                    vel_right_rear = vel_right_front;
+                    vel_left_front  = - vel_right_front;
+                    vel_left_rear = - vel_right_front;
+
+                    front_right_steering = atan(wheel_separation_length_/steering_track);
+                    rear_right_steering = -front_right_steering;
+                    front_left_steering = -front_right_steering;
+                    rear_left_steering = front_right_steering;
                 }
+                else if (!vx_flag && !vy_flag && !wz_flag) // Stop
+                {
+                    driving_mode_ = STOP_MODE;
+                    vel_right_front = 0;
+                    vel_right_rear = 0;
+                    vel_left_front  = 0;
+                    vel_left_rear = 0;
 
-                // Compute steering angles
-                // if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
-                // {
+                    front_right_steering = 0;
+                    rear_right_steering = 0;
+                    front_left_steering = 0;
+                    rear_left_steering = 0;                    
+                }
+                else if (vx_flag && vy_flag && !wz_flag) // All-Wheel Driving (crab motion)
+                {
+                    driving_mode_ = CRAB_MODE;
+                    const double sign_vx = copysign(1.0, curr_cmd_twist.lin_x);
+                    vel_right_front = sign_vx * std::hypot(curr_cmd_twist.lin_y,curr_cmd_twist.lin_x)/ wheel_radius_;
+                    vel_right_rear = vel_right_front;
+                    vel_left_front = vel_right_front;
+                    vel_left_rear = vel_right_front;
 
-                front_left_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*abs(curr_cmd_twist.lin_x) - curr_cmd_twist.ang*steering_track));
-                front_right_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*abs(curr_cmd_twist.lin_x) + curr_cmd_twist.ang*steering_track));
-                // }
-                // else
-                // {
-                //     front_left_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
-                //                                 (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
-                //     front_right_steering = -atan(curr_cmd_twist.ang*wheel_separation_length_ /
-                //                                 (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
-                // }
-                rear_left_steering = -front_left_steering;
-                rear_right_steering = -front_right_steering;
+                    // const double sign_vy = copysign(1.0, curr_cmd_twist.lin_y);
+                    front_right_steering = atan(curr_cmd_twist.lin_y/ curr_cmd_twist.lin_x);
+                    rear_right_steering = front_right_steering;
+                    front_left_steering = front_right_steering;
+                    rear_left_steering = front_right_steering;
+                }
+                else // Double Ackermann Driving
+                {
+                    driving_mode_ = DACK_MODE;
+                    // Compute wheels velocities:
+                    if(fabs(curr_cmd_twist.lin_x) > 0.001)
+                    {
+                        const double vel_steering_offset = (curr_cmd_twist.ang*wheel_steering_y_offset_)/wheel_radius_;
+                        const double sign = copysign(1.0, curr_cmd_twist.lin_x);
+                        vel_left_front  = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
+                                                            (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
+                                        - vel_steering_offset;
+                        vel_right_front = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
+                                                            (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
+                                        + vel_steering_offset;
+                        vel_left_rear = sign * std::hypot((curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track/2),
+                                                        (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
+                                        - vel_steering_offset;
+                        vel_right_rear = sign * std::hypot((curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track/2),
+                                                        (wheel_separation_length_*curr_cmd_twist.ang/2.0)) / wheel_radius_
+                                        + vel_steering_offset;
+                    }
+
+                    // Compute steering angles
+                    // if(fabs(2.0*curr_cmd_twist.lin_x) > fabs(curr_cmd_twist.ang*steering_track))
+                    // {
+
+                    front_left_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*abs(curr_cmd_twist.lin_x) - curr_cmd_twist.ang*steering_track));
+                    front_right_steering = atan2(curr_cmd_twist.ang*wheel_separation_length_, (2.0*abs(curr_cmd_twist.lin_x) + curr_cmd_twist.ang*steering_track));
+                    // }
+                    // else
+                    // {
+                    //     front_left_steering = atan(curr_cmd_twist.ang*wheel_separation_length_ /
+                    //                                 (2.0*curr_cmd_twist.lin_x - curr_cmd_twist.ang*steering_track));
+                    //     front_right_steering = -atan(curr_cmd_twist.ang*wheel_separation_length_ /
+                    //                                 (2.0*curr_cmd_twist.lin_x + curr_cmd_twist.ang*steering_track));
+                    // }
+                    rear_left_steering = -front_left_steering;
+                    rear_right_steering = -front_right_steering;
+                }
             }
+
+            // Set wheels velocities:
+            driving_control::WheelVelCmds w;
+            w.w1 = vel_right_front; //fr_wheel_joint
+            w.w2 = vel_right_rear; //br_wheel_joint
+            w.w3 = vel_left_front; //fl_wheel_joint
+            w.w4 = vel_left_rear; //bl_wheel_joint
+            pubWheelVelCmds.publish(w);
+            // ROS_INFO_STREAM("Wheel velocities commanded" << w);
+
+            /// TODO check limits to not apply the same steering on right and left when saturated !
+            motion_control::SteeringGroup s;
+            s.s1 = front_right_steering; //fr_steering_joint
+            s.s2 = rear_right_steering; //br_steering_joint
+            s.s3 = front_left_steering; //fl_steering_joint
+            s.s4 = rear_left_steering; //bl_steering_joint
+            pubSteeringAngles.publish(s);
+            // ROS_INFO_STREAM("Steering angles commanded" << s);            
         }
-
-        // Set wheels velocities:
-        driving_control::WheelVelCmds w;
-        w.w1 = vel_right_front; //fr_wheel_joint
-        w.w2 = vel_right_rear; //br_wheel_joint
-        w.w3 = vel_left_front; //fl_wheel_joint
-        w.w4 = vel_left_rear; //bl_wheel_joint
-        pubWheelVelCmds.publish(w);
-        // ROS_INFO_STREAM("Wheel velocities commanded" << w);
-
-        /// TODO check limits to not apply the same steering on right and left when saturated !
-        motion_control::SteeringGroup s;
-        s.s1 = front_right_steering; //fr_steering_joint
-        s.s2 = rear_right_steering; //br_steering_joint
-        s.s3 = front_left_steering; //fl_steering_joint
-        s.s4 = rear_left_steering; //bl_steering_joint
-        pubSteeringAngles.publish(s);
-        // ROS_INFO_STREAM("Steering angles commanded" << s);
 
         std_msgs::Int64 mode;
         mode.data = driving_mode_; //fr_steering_joint
