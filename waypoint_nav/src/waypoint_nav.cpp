@@ -16,14 +16,14 @@ WaypointNavigation::WaypointNavigation(ros::NodeHandle & nh)
 {
     // Subscriber
     subOdom = nh_.subscribe("localization/odometry/sensor_fusion", 10, &WaypointNavigation::odometryCallback, this);
-    subSmach = nh_.subscribe("state_machine/state", 10, &WaypointNavigation::smachCallback, this);
+    subSmach = nh_.subscribe("/state_machine/state", 10, &WaypointNavigation::smachCallback, this);
     subAvoidDirection = nh_.subscribe("driving/direction", 10, &WaypointNavigation::avoidObstacleCallback, this);
 
     // Publisher
     pubCmdVel = nh_.advertise<geometry_msgs::Twist>("driving/cmd_vel", 10);
     pubNavStatus = nh_.advertise<std_msgs::Int64>("navigation/status", 10);
-    pubWaypointUnreachable = nh_.advertise<std_msgs::Bool>("state_machine/waypoint_unreachable", 10);
-    pubArrivedAtWaypoint = nh_.advertise<std_msgs::Bool>("state_machine/arrived_at_waypoint", 10);
+    pubWaypointUnreachable = nh_.advertise<std_msgs::Bool>("/state_machine/waypoint_unreachable", 10);
+    pubArrivedAtWaypoint = nh_.advertise<std_msgs::Bool>("/state_machine/arrived_at_waypoint", 10);
 
     // Service Servers
     srv_set_goal_ = nh_.advertiseService("navigation/set_goal", &WaypointNavigation::setGoal, this);
