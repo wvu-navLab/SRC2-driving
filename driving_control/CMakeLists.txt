@@ -111,7 +111,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES motion_control
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs 
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control driving_tools
 #  DEPENDS system_lib
 )
 
