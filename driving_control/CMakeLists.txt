@@ -145,11 +145,11 @@ include_directories(
 
 add_executable(fws_driving src/fws_driving.cpp)
 target_link_libraries(fws_driving ${catkin_LIBRARIES})
-add_dependencies(fws_driving driving_control_generate_messages_cpp)
+add_dependencies(fws_driving driving_control_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 add_executable(wheel_control src/wheel_control.cpp)
 target_link_libraries(wheel_control ${catkin_LIBRARIES})
-add_dependencies(wheel_control driving_control_generate_messages_cpp)
+add_dependencies(wheel_control driving_control_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
