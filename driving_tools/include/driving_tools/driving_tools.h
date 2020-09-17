@@ -25,6 +25,8 @@
 #include <driving_tools/RotateInPlace.h>
 #include <driving_tools/CirculateBaseStation.h>
 #include <driving_tools/MoveForward.h>
+#include <driving_tools/TurnWheelsSideways.h>
+#include <driving_tools/MoveSideways.h>
 #include <std_msgs/Int64.h>
 
 // ConstantsS
@@ -80,6 +82,8 @@ private:
     ros::ServiceServer rotateInPlaceServer;
     ros::ServiceServer circBaseStationServer;
     ros::ServiceServer moveForwardServer;
+    ros::ServiceServer turnWheelsSidewaysServer;
+    ros::ServiceServer moveSidewaysServer;
 
     // Publishers
     ros::Publisher pubDrivingMode;
@@ -97,6 +101,8 @@ public:
     bool RotateInPlace(driving_tools::RotateInPlace::Request  &req, driving_tools::RotateInPlace::Response &res);
     bool CirculateBaseStation(driving_tools::CirculateBaseStation::Request  &req, driving_tools::CirculateBaseStation::Response &res);
     bool MoveForward(driving_tools::MoveForward::Request  &req, driving_tools::MoveForward::Response &res);
+    bool TurnWheelsSideways(driving_tools::TurnWheelsSideways::Request  &req, driving_tools::TurnWheelsSideways::Response &res);
+    bool MoveSideways(driving_tools::MoveSideways::Request  &req, driving_tools::MoveSideways::Response &res);
 };
 
 

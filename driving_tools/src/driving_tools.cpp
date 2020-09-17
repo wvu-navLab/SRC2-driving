@@ -22,6 +22,8 @@ DrivingTools::DrivingTools()
   rotateInPlaceServer = nh_.advertiseService("driving/rotate_in_place", &DrivingTools::RotateInPlace, this);
   circBaseStationServer = nh_.advertiseService("driving/circ_base_station", &DrivingTools::CirculateBaseStation, this);
   moveForwardServer = nh_.advertiseService("driving/move_forward", &DrivingTools::MoveForward, this);
+  turnWheelsSidewaysServer = nh_.advertiseService("driving/turn_wheels_sideways", &DrivingTools::TurnWheelsSideways, this);
+  moveSidewaysServer = nh_.advertiseService("driving/move_sideways", &DrivingTools::MoveSideways, this);
 }
 
 bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, driving_tools::RotateInPlace::Response &res)
@@ -110,6 +112,70 @@ bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, drivin
   s2 = 0;
   s3 = 0;
   s4 = 0;
+
+  s.s1 = s1;
+  s.s2 = s2;
+  s.s3 = s3;
+  s.s4 = s4;
+
+  double throttle = req.throttle;
+  // Grab the directional data
+  m1 = throttle * MAX_MOTOR_EFFORT;
+  m2 = throttle * MAX_MOTOR_EFFORT;
+  m3 = throttle * MAX_MOTOR_EFFORT;
+  m4 = throttle * MAX_MOTOR_EFFORT;
+
+  m.m1 = m1;
+  m.m2 = m2;
+  m.m3 = m3;
+  m.m4 = m4;
+
+  std_msgs::Int64 mode;
+  mode.data = driving_mode_;
+  pubDrivingMode.publish(mode);
+  pubMotorEfforts.publish(m);
+  pubSteeringEfforts.publish(s);
+
+  res.success = true;
+  return true;
+}
+
+
+bool DrivingTools::TurnWheelsSideways(driving_tools::TurnWheelsSideways::Request  &req, driving_tools::TurnWheelsSideways::Response &res)
+{
+  driving_mode_ = CRAB_MODE;
+
+  // ROS_INFO("Move Forward Service requested.");
+  // Rotate wheels at 45 deg
+  s1 = MAX_STEERING_ANGLE;
+  s2 = MAX_STEERING_ANGLE;
+  s3 = MAX_STEERING_ANGLE;
+  s4 = MAX_STEERING_ANGLE;
+
+  s.s1 = s1;
+  s.s2 = s2;
+  s.s3 = s3;
+  s.s4 = s4;
+
+  std_msgs::Int64 mode;
+  mode.data = driving_mode_;
+  pubDrivingMode.publish(mode);
+  pubSteeringEfforts.publish(s);
+
+  res.success = true;
+  return true;
+}
+
+bool DrivingTools::MoveSideways(driving_tools::MoveSideways::Request  &req, driving_tools::MoveSideways::Response &res)
+{
+  driving_mode_ = DACK_MODE;
+
+  // ROS_INFO("Move Forward Service requested.");
+  // Rotate wheels at 45 deg
+  s1 = MAX_STEERING_ANGLE;
+  s2 = MAX_STEERING_ANGLE;
+  s3 = MAX_STEERING_ANGLE;
+  s4 = MAX_STEERING_ANGLE;
 
   s.s1 = s1;
   s.s2 = s2;

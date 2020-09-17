@@ -63,6 +63,8 @@ add_service_files(
   Stop.srv
   CirculateBaseStation.srv
   RotateInPlace.srv
+  TurnWheelsSideways.srv
+  MoveSideways.srv
 )
 
 ## Generate actions in the 'action' folder
