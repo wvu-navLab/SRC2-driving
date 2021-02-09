@@ -1,31 +1,47 @@
 # SRC2-driving stack
 
-## Installing the packages
 
-Create a catkin workspace. For instructions on how to create the workspace go here. Download the move_package and move to this new src/ folder. 
+## Launch the sim
+
 
 ```
-cd ~/catkin_ws/
-mkdir src
+~/srcp2-final-public/docker/scripts/run_srcp2_final -C ~/srcp2-final-public/config/default_config.yaml
+```
+
+## Installing the packages
+
+Open another terminal and login to Docker enviroment.
+```
+~/srcp2-final-public/docker/scripts/run_comp_final -d -i
+source ~/ros_workspace/install/setup.bash
+```
+Download the SRC2_driving stack. 
+
+```
+cd ~/cmp_workspace/src
 git clone https://github.com/wvu-navLab/SRC2-driving.git
 ```
 
-Compile and build the packages.
+Build and source the packages.
 
 ```
 cd ..
-catkin_make
+catkin build
+source devel/setup.bash
 ```
 
 ## Running and testing the nodes
 
-1. Use the launch file. Round 1 and 3, `{rover_type}` is `scout`. For round 2 `{rover_type}` is either `excavator` or `hauler`.
+Use the launch files substituting the parameter `{rover_type}`:`scout`, `excavator`, `hauler`.
 
+To run the teleop:
 ```
-cd ~/catkin_ws/
-source devel/setup.bash
-roslaunch driving_tools {rover_type}_driving_tools
-roslaunch motion_control {rover_type}_motion_control
+export ROS_MASTER_URI=http://172.18.0.2:11311
+roslaunch teleop_modes {rover_type}_teleop_modes
+```
+
+To run the 4WS controllers:
+```
+export ROS_MASTER_URI=http://172.18.0.2:11311
 roslaunch driving_control {rover_type}_driving_control
-roslaunch teleop_modes {rover_type}_driving_control
 ```
