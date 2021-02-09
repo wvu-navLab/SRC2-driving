@@ -11,10 +11,11 @@ SensorCommander::SensorCommander(ros::NodeHandle & nh)
  
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("driving/sensor_joint_angle", 1000, &SensorCommander::messageCallback, this);
+  sub_ = nh_.subscribe("control/sensor/joint_angles", 1000, &SensorCommander::messageCallback, this);
 
   // Node publishes individual joint positions
-  pub_ = nh_.advertise<std_msgs::Float64>("sensor_controller/command", 1000);
+  pub1_ = nh_.advertise<std_msgs::Float64>("sensor/pitch/command/position", 1000);
+  pub2_ = nh_.advertise<std_msgs::Float64>("sensor/yaw/command/position", 1000);
 } // end SensorCommander()
 
 /*--------------------------------------------------------------------
@@ -31,11 +32,13 @@ SensorCommander::~SensorCommander()
  * Callback function for subscriber.
  *------------------------------------------------------------------*/
 
-void SensorCommander::messageCallback(const motion_control::SensorJoint::ConstPtr &msg)
+void SensorCommander::messageCallback(const motion_control::SensorGroup::ConstPtr &msg)
 {
   j1.data = msg->j1;
+  j2.data = msg->j2;
 
-  pub_.publish(j1);
+  pub1_.publish(j1);
+  pub2_.publish(j2);
 
 } // end publishCallback()
 

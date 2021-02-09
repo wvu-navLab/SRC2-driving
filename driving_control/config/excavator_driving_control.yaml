@@ -1,0 +1,8 @@
+robot_name: "small_excavator_1"
+joint_state_controller_publish_rate: 15.0
+max_velocity: 0.53
+wheel_radius: 0.17
+wheel_separation_length: 1.07
+wheel_separation_width: 1.00
+wheel_steering_y_offset: 0.00
+cmd_vel_timeout: 1.0

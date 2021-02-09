@@ -1,55 +1,33 @@
 <launch>
-<arg name="robot_namespace" default="/excavator_1"/>
+  <group ns="small_excavator_1">
+    <!-- load the lidar/camera mount joint commander -->
+    <node name="cmd_sensor" 
+      pkg="motion_control" 
+      type="cmd_sensor"
+      respawn="false" 
+      output="screen"/>
 
-  <!-- load the lidar/camera mount joint commander -->
-  <node name="cmd_sensor" 
-	pkg="motion_control" 
-	type="cmd_sensor"
-	respawn="false" 
-	output="screen" 
-	ns="$(arg robot_namespace)"/>
-    	<remap from="sensor_controller/command" to="$(arg robot_namespace)/sensor_controller/command"/>
+    <!-- load the manipulator's joints commander -->
+    <node name="cmd_arm" 
+      pkg="motion_control" 
+      type="cmd_arm"
+      respawn="false" 
+      output="screen"/>
 
+    <!-- load the wheels' motor torques commanders -->
+    <node name="cmd_wheels" 
+      pkg="motion_control" 
+      type="cmd_wheels"
+      respawn="false" 
+      output="screen"/>
 
-  <!-- load the manipulator's joints commander -->
-  <node name="cmd_joints" 
-	pkg="motion_control" 
-	type="cmd_joints"
-	respawn="false" 
-	output="screen" 
-	ns="$(arg robot_namespace)"/>
-    	<remap from="mount_joint_controller/command" to="$(arg robot_namespace)/mount_joint_controller/command"/>
-	<remap from="basearm_joint_controller/command" to="$(arg robot_namespace)/basearm_joint_controller/command"/>
-    	<remap from="distalarm_joint_controller/command" to="$(arg robot_namespace)/distalarm_joint_controller/command"/>
-	<remap from="bucket_joint_controller/command" to="$(arg robot_namespace)/bucket_joint_controller/command"/>
-
-
-  <!-- load the wheels' motor torques commanders -->
-  <node name="cmd_motors" 
-	pkg="motion_control" 
-	type="cmd_motors"
-	respawn="false" 
-	output="screen" 
-	ns="$(arg robot_namespace)"/>
-    	<remap from="fr_wheel_controller/command" to="$(arg robot_namespace)/fr_wheel_controller/command"/>
-	<remap from="br_wheel_controller/command" to="$(arg robot_namespace)/br_wheel_controller/command"/>
-    	<remap from="fl_wheel_controller/command" to="$(arg robot_namespace)/fl_wheel_controller/command"/>
-	<remap from="bl_wheel_controller/command" to="$(arg robot_namespace)/bl_wheel_controller/command"/>
-
-
-  <!-- load the steering arms' joints commanders -->
-  <node name="cmd_steering" 
-	pkg="motion_control" 
-	type="cmd_steering"
-	respawn="false" 
-	output="screen" 
-	ns="$(arg robot_namespace)"/>
-        <remap from="fr_steering_arm_controller/command" to="$(arg robot_namespace)/fr_steering_arm_controller/command"/>
-	<remap from="br_steering_arm_controller/command" to="$(arg robot_namespace)/br_steering_arm_controller/command"/>
-    	<remap from="fl_steering_arm_controller/command" to="$(arg robot_namespace)/fl_steering_arm_controller/command"/>
-	<remap from="bl_steering_arm_controller/command" to="$(arg robot_namespace)/bl_steering_arm_controller/command"/>
-        
-
+    <!-- load the steering arms' joints commanders -->
+    <node name="cmd_steering" 
+      pkg="motion_control" 
+      type="cmd_steering"
+      respawn="false" 
+      output="screen"/>
+  </group>        
 </launch>
 
 

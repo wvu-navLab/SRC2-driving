@@ -1,40 +1,40 @@
-#include "motion_control/cmd_joints.h"
+#include "motion_control/cmd_arm.h"
 
 /*--------------------------------------------------------------------
- * JointsCommander()
+ * ArmCommander()
  * Constructor.
  *------------------------------------------------------------------*/
 
-JointsCommander::JointsCommander(ros::NodeHandle & nh)
+ArmCommander::ArmCommander(ros::NodeHandle & nh)
 : nh_(nh)
 {
 
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("manipulation/arm_joint_angles", 1000, &JointsCommander::messageCallback, this);
+  sub_ = nh_.subscribe("control/arm/joint_angles", 1000, &ArmCommander::messageCallback, this);
 
   // Node publishes individual joint positions
-  pub1_ = nh_.advertise<std_msgs::Float64>("mount_joint_controller/command", 1000);
-  pub2_ = nh_.advertise<std_msgs::Float64>("basearm_joint_controller/command", 1000);
-  pub3_ = nh_.advertise<std_msgs::Float64>("distalarm_joint_controller/command", 1000);
-  pub4_ = nh_.advertise<std_msgs::Float64>("bucket_joint_controller/command", 1000);
-} // end JointsCommander()
+  pub1_ = nh_.advertise<std_msgs::Float64>("arm/shoulder_yaw/command/position", 1000);
+  pub2_ = nh_.advertise<std_msgs::Float64>("arm/shoulder_pitch/command/position", 1000);
+  pub3_ = nh_.advertise<std_msgs::Float64>("arm/elbow_pitch/command/position", 1000);
+  pub4_ = nh_.advertise<std_msgs::Float64>("arm/wrist_pitch/command/position", 1000);
+} // end ArmCommander()
 
 /*--------------------------------------------------------------------
- * ~JointsCommander()
+ * ~ArmCommander()
  * Destructor.
  *------------------------------------------------------------------*/
 
-JointsCommander::~JointsCommander()
+ArmCommander::~ArmCommander()
 {
-} // end ~JointsCommander()
+} // end ~ArmCommander()
 
 /*--------------------------------------------------------------------
  * messageCallback()
  * Callback function for subscriber.
  *------------------------------------------------------------------*/
 
-void JointsCommander::messageCallback(const motion_control::JointGroup::ConstPtr &msg)
+void ArmCommander::messageCallback(const motion_control::ArmGroup::ConstPtr &msg)
 {
   q1.data = msg->q1;
   q2.data = msg->q2;
@@ -63,11 +63,11 @@ void JointsCommander::messageCallback(const motion_control::JointGroup::ConstPtr
 int main(int argc, char **argv)
 {
   // Set up ROS.
-  ros::init(argc, argv, "cmd_joints");
+  ros::init(argc, argv, "cmd_arm");
   ros::NodeHandle nh("");
 
-  // Create a new JointsCommander object.
-  JointsCommander joints_commander(nh);
+  // Create a new ArmCommander object.
+  ArmCommander arm_commander(nh);
 
   ros::spin();
 

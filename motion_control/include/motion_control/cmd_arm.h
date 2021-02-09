@@ -1,25 +1,25 @@
-#ifndef CMD_JOINTS_H
-#define CMD_JOINTS_H
+#ifndef CMD_ARM_H
+#define CMD_ARM_H
 
 // ROS includes.
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
 
 // Custom message includes. Auto-generated from msg/ directory.
-#include "motion_control/JointGroup.h"
+#include "motion_control/ArmGroup.h"
 
 
-class JointsCommander
+class ArmCommander
 {
 public:
   //! Constructor.
-  JointsCommander(ros::NodeHandle & nh);
+  ArmCommander(ros::NodeHandle & nh);
 
   //! Destructor.
-  ~JointsCommander();
+  ~ArmCommander();
 
   //! Callback function for subscriber.
-  void messageCallback(const motion_control::JointGroup::ConstPtr &msg);
+  void messageCallback(const motion_control::ArmGroup::ConstPtr &msg);
 
   //! Joint angles
   std_msgs::Float64 q1;
@@ -39,4 +39,4 @@ private:
   ros::Subscriber sub_;  
 };
 
-#endif // CMD_JOINTS_H
+#endif // CMD_ARM_H

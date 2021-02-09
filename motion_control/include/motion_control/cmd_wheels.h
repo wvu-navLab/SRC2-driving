@@ -1,28 +1,28 @@
-#ifndef CMD_MOTORS_H
-#define CMD_MOTORS_H
+#ifndef CMD_WHEELS_H
+#define CMD_WHEELS_H
 
 // ROS includes.
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
 
 // Custom message includes. Auto-generated from msg/ directory.
-#include "motion_control/MotorGroup.h"
+#include "motion_control/WheelGroup.h"
 
 
-class MotorsCommander
+class WheelsCommander
 {
 public:
   //! Constructor.
-  MotorsCommander(ros::NodeHandle & nh);
+  WheelsCommander(ros::NodeHandle & nh);
 
   //! Destructor.
-  ~MotorsCommander();
+  ~WheelsCommander();
 
   //! Callback function for subscriber.
-  void messageCallback(const motion_control::MotorGroup::ConstPtr &msg);
+  void messageCallback(const motion_control::WheelGroup::ConstPtr &msg);
 
   //! Joint angles
-  std_msgs::Float64 m1, m2, m3, m4;
+  std_msgs::Float64 w1, w2, w3, w4;
 
 private:
   // Node Handle
@@ -32,4 +32,4 @@ private:
   ros::Subscriber sub_;  
 };
 
-#endif // CMD_MOTORS_H
+#endif // CMD_WHEELS_H

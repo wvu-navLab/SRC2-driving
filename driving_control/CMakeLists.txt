@@ -53,10 +53,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  WheelVelCmds.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -147,10 +148,6 @@ add_executable(fws_driving src/fws_driving.cpp)
 target_link_libraries(fws_driving ${catkin_LIBRARIES})
 add_dependencies(fws_driving driving_control_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
-add_executable(wheel_control src/wheel_control.cpp)
-target_link_libraries(wheel_control ${catkin_LIBRARIES})
-add_dependencies(wheel_control driving_control_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
-
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -167,10 +164,6 @@ add_dependencies(wheel_control driving_control_generate_messages_cpp ${catkin_EX
 # )
 
 target_link_libraries(fws_driving 
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(wheel_control
   ${catkin_LIBRARIES}
 )
 

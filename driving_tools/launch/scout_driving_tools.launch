@@ -1,6 +1,6 @@
 <launch> 
 
-  <group ns="scout_1">
+  <group ns="small_scout_1">
     <node pkg="driving_tools"
           name="driving_tools"
           type="driving_tools"

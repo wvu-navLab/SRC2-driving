@@ -16,20 +16,19 @@ TeleopModesKey::TeleopModesKey(ros::NodeHandle & nh)
 : nh_(nh)
 {
   // Node publishes the messages in appropriate topics
-  pubJointAngles = nh_.advertise<motion_control::JointGroup>("arm_joint_angles", 1000);
-  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("motor_efforts", 1000);
-  pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("steering_joint_angles", 1000);
-  pubSensorAngle = nh_.advertise<motion_control::SensorJoint>("sensor_joint_angle", 1000);
-  pubBinAngle = nh_.advertise<motion_control::BinJoint>("bin_joint_angle", 1000);
-  clientLights = nh_.serviceClient<srcp2_msgs::ToggleLightSrv>("/toggle_light");
+  pubArmAngles = nh_.advertise<motion_control::ArmGroup>("control/arm/joint_angles", 1000);
+  pubWheelVels = nh_.advertise<motion_control::WheelGroup>("control/drive/wheel_velocities", 1000);
+  pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("control/steering/joint_angles", 1000);
+  pubSensorAngles = nh_.advertise<motion_control::SensorGroup>("control/sensor/joint_angles", 1000);
+  pubBinAngle = nh_.advertise<motion_control::BinJoint>("control/bin/joint_angle", 1000);
 
   // initialize driving mode
   mode = DRIVE_ACKE_MODE;
 
   // Initialize teleop with zero commands
-  j.j1 = 0;
-  q.q1 = 0; q.q2 =  JOINT2_MIN; q.q3 = JOINT3_MAX; q.q4 = JOINT4_MAX; // Arm will move to HOME_MODE
-  m.m1 = 0; m.m2 = 0; m.m3 = 0; m.m4 = 0;
+  j.j1 = 0; j.j2 = 0;
+  q.q1 = 0; q.q2 =  ARM2_MIN; q.q3 = ARM3_MAX; q.q4 = ARM4_MAX; // Arm will move to HOME_MODE
+  w.w1 = 0; w.w2 = 0; w.w3 = 0; w.w4 = 0;
   s.s1 = 0; s.s2 = 0; s.s3 = 0; s.s4 = 0;
   b.b1 = 0;
 
@@ -73,10 +72,10 @@ void TeleopModesKey::GetKey()
 
 void TeleopModesKey::PublishAll()
 {
-  pubJointAngles.publish(q);
-  pubMotorEfforts.publish(m);
+  pubArmAngles.publish(q);
+  pubWheelVels.publish(w);
   pubSteeringAngles.publish(s);
-  pubSensorAngle.publish(j);
+  pubSensorAngles.publish(j);
   pubBinAngle.publish(b);
   PrintStatus();
   PrintCmdReminders();
@@ -94,67 +93,39 @@ void TeleopModesKey::ResolveKey()
         mode = modeBindings[key][0];        
         s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         s.s1 = s1; s.s2 = s2; s.s3 = s3; s.s4 = s4;
-        m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll();
-      }
-      // If the key corresponds to a key in lightBindings
-      else if (lightBindings.count(key) == 1)
-      {
-
-        lights_mode = fmod(lights_mode + 1,3);
-        srcp2_msgs::ToggleLightSrv srv;
-
-        switch (lights_mode)
-        {
-          case 0:
-            {
-              srv.request.data = "stop";
-            }
-            break;
-          case 1:
-            {
-              srv.request.data = "low";
-            }
-            break;
-          case 2:
-            {
-              srv.request.data = "high";
-            }
-            break;
-        }
-        bool success = clientLights.call(srv);
-        if (success)
-        {
-          ROS_WARN_STREAM("Light mode switched ");
-        }
-        else
-        {
-          ROS_ERROR_STREAM("Failed to toggle light.");
-        }
       }
       // If the key corresponds to a key in sensorBindings
       else if (sensorBindings.count(key) == 1)
       {
-
         if (key == KEYCODE_0)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
           j.j1 = j1; // Update the current sensor angle message
         }
+        else if (key == KEYCODE_o)
+        {
+          // Grab the change and update the current joint angles message
+          j2 = 0;
+          j.j2 = j2; // Update the current sensor angle message
+        }
         else
         {
           // Grab the change and update the current joint angles message
-          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, -PI/8, PI/4);
+          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, SENSOR1_MIN, SENSOR1_MAX);
+          j2 = ConstrainAngle(j2 + (sensorBindings[key][1]*step)*PI/180, SENSOR2_MIN, SENSOR2_MAX);
           j.j1 = j1; // Update the current sensor angle message
+          j.j2 = j2; // Update the current sensor angle message
         }
         PublishAll();
       }
       else if (binBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, -PI, PI);
+        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, BIN_MIN, BIN_MAX);
         b.b1 = b1; // Update the current bin angle message
         PublishAll();
       }
@@ -162,10 +133,10 @@ void TeleopModesKey::ResolveKey()
       else if (manipulatorBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, -PI, PI); // Update the current joint angles message
-        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, -PI/3, PI/5);
-        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, -PI/3, PI/3);
-        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, 0, 5*PI/4);
+        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, ARM1_MIN, ARM1_MAX); // Update the current joint angles message
+        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, ARM2_MIN, ARM2_MAX);
+        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, ARM3_MIN, ARM3_MAX);
+        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, ARM4_MIN, ARM4_MAX);
         q.q1 = q1;
         q.q2 = q2;
         q.q3 = q3;
@@ -176,15 +147,15 @@ void TeleopModesKey::ResolveKey()
       else if (skidMotorBindings.count(key) == 1)
       {
         // Grab the directional data
-        m1 = skidMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
-        m2 = skidMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
-        m3 = skidMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
-        m4 = skidMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
+        w1 = skidMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
+        w2 = skidMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
+        w3 = skidMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
+        w4 = skidMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
 
-        m.m1 = m1;
-        m.m2 = m2;
-        m.m3 = m3;
-        m.m4 = m4;
+        w.w1 = w1;
+        w.w2 = w2;
+        w.w3 = w3;
+        w.w4 = w4;
         PublishAll();
       }
       else if (stepBindings.count(key) == 1)
@@ -204,8 +175,8 @@ void TeleopModesKey::ResolveKey()
       // Otherwise, set the robot to stop
       else
       {
-        //m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        //m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        //w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        //w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll(); 
       }
     }
@@ -219,67 +190,39 @@ void TeleopModesKey::ResolveKey()
         mode = modeBindings[key][0];        
         s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         s.s1 = s1; s.s2 = s2; s.s3 = s3; s.s4 = s4;
-        m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll();
-      }
-      // If the key corresponds to a key in lightBindings
-      else if (lightBindings.count(key) == 1)
-      {
-
-        lights_mode = fmod(lights_mode + 1,3);
-        srcp2_msgs::ToggleLightSrv srv;
-
-        switch (lights_mode)
-        {
-          case 0:
-            {
-              srv.request.data = "stop";
-            }
-            break;
-          case 1:
-            {
-              srv.request.data = "low";
-            }
-            break;
-          case 2:
-            {
-              srv.request.data = "high";
-            }
-            break;
-        }
-        bool success = clientLights.call(srv);
-        if (success)
-        {
-          ROS_WARN_STREAM("Light mode switched ");
-        }
-        else
-        {
-          ROS_ERROR_STREAM("Failed to toggle light.");
-        }
       }
       // If the key corresponds to a key in sensorBindings
       else if (sensorBindings.count(key) == 1)
       {
-
         if (key == KEYCODE_0)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
           j.j1 = j1; // Update the current sensor angle message
         }
+        else if (key == KEYCODE_o)
+        {
+          // Grab the change and update the current joint angles message
+          j2 = 0;
+          j.j2 = j2; // Update the current sensor angle message
+        }
         else
         {
           // Grab the change and update the current joint angles message
-          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, -PI/8, PI/4);
+          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, SENSOR1_MIN, SENSOR1_MAX);
+          j2 = ConstrainAngle(j2 + (sensorBindings[key][1]*step)*PI/180, SENSOR2_MIN, SENSOR2_MAX);
           j.j1 = j1; // Update the current sensor angle message
+          j.j2 = j2; // Update the current sensor angle message
         }
         PublishAll();
       }
       else if (binBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, -PI, PI);
+        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, BIN_MIN, BIN_MAX);
         b.b1 = b1; // Update the current bin angle message
         PublishAll();
       }
@@ -287,10 +230,10 @@ void TeleopModesKey::ResolveKey()
       else if (manipulatorBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, -PI, PI); // Update the current joint angles message
-        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, -PI/3, PI/5);
-        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, -PI/3, PI/3);
-        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, 0, 5*PI/4);
+        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, ARM1_MIN, ARM1_MAX); // Update the current joint angles message
+        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, ARM2_MIN, ARM2_MAX);
+        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, ARM3_MIN, ARM3_MAX);
+        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, ARM4_MIN, ARM4_MAX);
         q.q1 = q1;
         q.q2 = q2;
         q.q3 = q3;
@@ -344,15 +287,15 @@ void TeleopModesKey::ResolveKey()
       else if (crabMotorBindings.count(key) == 1)
       {
         // Grab the directional data
-        m1 = crabMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
-        m2 = crabMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
-        m3 = crabMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
-        m4 = crabMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
+        w1 = crabMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
+        w2 = crabMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
+        w3 = crabMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
+        w4 = crabMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
 
-        m.m1 = m1;
-        m.m2 = m2;
-        m.m3 = m3;
-        m.m4 = m4;
+        w.w1 = w1;
+        w.w2 = w2;
+        w.w3 = w3;
+        w.w4 = w4;
         PublishAll();
       }
       else if (stepBindings.count(key) == 1)
@@ -374,8 +317,8 @@ void TeleopModesKey::ResolveKey()
       {
         //s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         //s.s1 = s1; s.s2 = s2; s.s3 = s3; s.s4 = s4;
-        //m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        //m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        //w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        //w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll();  
       }
     }
@@ -389,67 +332,38 @@ void TeleopModesKey::ResolveKey()
         mode = modeBindings[key][0];        
         s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         s.s1 = s1; s.s2 = s2; s.s3 = s3; s.s4 = s4;
-        m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll();
       }
-      // If the key corresponds to a key in lightBindings
-      else if (lightBindings.count(key) == 1)
-      {
-
-        lights_mode = fmod(lights_mode + 1,3);
-        srcp2_msgs::ToggleLightSrv srv;
-
-        switch (lights_mode)
-        {
-          case 0:
-            {
-              srv.request.data = "stop";
-            }
-            break;
-          case 1:
-            {
-              srv.request.data = "low";
-            }
-            break;
-          case 2:
-            {
-              srv.request.data = "high";
-            }
-            break;
-        }
-        bool success = clientLights.call(srv);
-        if (success)
-        {
-          ROS_WARN_STREAM("Light mode switched ");
-        }
-        else
-        {
-          ROS_ERROR_STREAM("Failed to toggle light.");
-        }
-      }
-      // If the key corresponds to a key in sensorBindings
       else if (sensorBindings.count(key) == 1)
       {
-
         if (key == KEYCODE_0)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
           j.j1 = j1; // Update the current sensor angle message
         }
+        else if (key == KEYCODE_o)
+        {
+          // Grab the change and update the current joint angles message
+          j2 = 0;
+          j.j2 = j2; // Update the current sensor angle message
+        }
         else
         {
           // Grab the change and update the current joint angles message
-          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, -PI/8, PI/4);
+          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, SENSOR1_MIN, SENSOR1_MAX);
+          j2 = ConstrainAngle(j2 + (sensorBindings[key][1]*step)*PI/180, SENSOR2_MIN, SENSOR2_MAX);
           j.j1 = j1; // Update the current sensor angle message
+          j.j2 = j2; // Update the current sensor angle message
         }
         PublishAll();
       }
       else if (binBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, -PI, PI);
+        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, BIN_MIN, BIN_MAX);
         b.b1 = b1; // Update the current bin angle message
         PublishAll();
       }
@@ -457,10 +371,10 @@ void TeleopModesKey::ResolveKey()
       else if (manipulatorBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, -PI, PI); // Update the current joint angles message
-        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, -PI/3, PI/5);
-        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, -PI/3, PI/3);
-        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, 0, 5*PI/4);
+        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, ARM1_MIN, ARM1_MAX); // Update the current joint angles message
+        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, ARM2_MIN, ARM2_MAX);
+        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, ARM3_MIN, ARM3_MAX);
+        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, ARM4_MIN, ARM4_MAX);
         q.q1 = q1;
         q.q2 = q2;
         q.q3 = q3;
@@ -481,14 +395,14 @@ void TeleopModesKey::ResolveKey()
       else if (ackeMotorBindings.count(key) == 1)
       {
         // Grab the directional data
-        m1 = ackeMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
-        m2 = ackeMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
-        m3 = ackeMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
-        m4 = ackeMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
-        m.m1 = m1;
-        m.m2 = m2;
-        m.m3 = m3;
-        m.m4 = m4;
+        w1 = ackeMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
+        w2 = ackeMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
+        w3 = ackeMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
+        w4 = ackeMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
+        w.w1 = w1;
+        w.w2 = w2;
+        w.w3 = w3;
+        w.w4 = w4;
         PublishAll();
       }
       // If the key corresponds to a key in stepBindings
@@ -512,8 +426,8 @@ void TeleopModesKey::ResolveKey()
       {
         //s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         //s.s1 = s1; s.s2 = s2; s.s3 = s3; s.s4 = s4;
-        //m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        //m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        //w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        //w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll();
       }
     }
@@ -527,67 +441,39 @@ void TeleopModesKey::ResolveKey()
         mode = modeBindings[key][0];        
         s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         s.s1 = s1; s.s2 = s2; s.s3 = s3; s.s4 = s4;
-        m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll();
-      }
-      // If the key corresponds to a key in lightBindings
-      else if (lightBindings.count(key) == 1)
-      {
-
-        lights_mode = fmod(lights_mode + 1,3);
-        srcp2_msgs::ToggleLightSrv srv;
-
-        switch (lights_mode)
-        {
-          case 0:
-            {
-              srv.request.data = "stop";
-            }
-            break;
-          case 1:
-            {
-              srv.request.data = "low";
-            }
-            break;
-          case 2:
-            {
-              srv.request.data = "high";
-            }
-            break;
-        }
-        bool success = clientLights.call(srv);
-        if (success)
-        {
-          ROS_WARN_STREAM("Light mode switched ");
-        }
-        else
-        {
-          ROS_ERROR_STREAM("Failed to toggle light.");
-        }
       }
       // If the key corresponds to a key in sensorBindings
       else if (sensorBindings.count(key) == 1)
       {
-
         if (key == KEYCODE_0)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
           j.j1 = j1; // Update the current sensor angle message
         }
+        else if (key == KEYCODE_o)
+        {
+          // Grab the change and update the current joint angles message
+          j2 = 0;
+          j.j2 = j2; // Update the current sensor angle message
+        }
         else
         {
           // Grab the change and update the current joint angles message
-          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, -PI/8, PI/4);
+          j1 = ConstrainAngle(j1 + (sensorBindings[key][0]*step)*PI/180, SENSOR1_MIN, SENSOR1_MAX);
+          j2 = ConstrainAngle(j2 + (sensorBindings[key][1]*step)*PI/180, SENSOR2_MIN, SENSOR2_MAX);
           j.j1 = j1; // Update the current sensor angle message
+          j.j2 = j2; // Update the current sensor angle message
         }
         PublishAll();
       }
       else if (binBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, -PI, PI);
+        b1 = ConstrainAngle(b1 + (binBindings[key][0]*step)*PI/180, BIN_MIN, BIN_MAX);
         b.b1 = b1; // Update the current bin angle message
         PublishAll();
       }
@@ -595,10 +481,10 @@ void TeleopModesKey::ResolveKey()
       else if (manipulatorBindings.count(key) == 1)
       {
         // Grab the change and update the current joint angles message
-        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, -PI, PI); // Update the current joint angles message
-        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, -PI/3, PI/5);
-        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, -PI/3, PI/3);
-        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, 0, 5*PI/4);
+        q1 = ConstrainAngle(q1 + manipulatorBindings[key][0] * step * PI/180, ARM1_MIN, ARM1_MAX); // Update the current joint angles message
+        q2 = ConstrainAngle(q2 + manipulatorBindings[key][1] * step * PI/180, ARM2_MIN, ARM2_MAX);
+        q3 = ConstrainAngle(q3 + manipulatorBindings[key][2] * step * PI/180, ARM3_MIN, ARM3_MAX);
+        q4 = ConstrainAngle(q4 + manipulatorBindings[key][3] * step * PI/180, ARM4_MIN, ARM4_MAX);
         q.q1 = q1;
         q.q2 = q2;
         q.q3 = q3;
@@ -623,14 +509,14 @@ void TeleopModesKey::ResolveKey()
       else if (ackeMotorBindings.count(key) == 1)
       {
         // Grab the directional data
-        m1 = dAckeMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
-        m2 = dAckeMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
-        m3 = dAckeMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
-        m4 = dAckeMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
-        m.m1 = m1;
-        m.m2 = m2;
-        m.m3 = m3;
-        m.m4 = m4;
+        w1 = dAckeMotorBindings[key][0] * throttle * MAX_MOTOR_EFFORT;
+        w2 = dAckeMotorBindings[key][1] * throttle * MAX_MOTOR_EFFORT;
+        w3 = dAckeMotorBindings[key][2] * throttle * MAX_MOTOR_EFFORT;
+        w4 = dAckeMotorBindings[key][3] * throttle * MAX_MOTOR_EFFORT;
+        w.w1 = w1;
+        w.w2 = w2;
+        w.w3 = w3;
+        w.w4 = w4;
         PublishAll();
       }
       // If the key corresponds to a key in stepBindings
@@ -654,8 +540,8 @@ void TeleopModesKey::ResolveKey()
       {
         //s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         //s.s1 = s1; s.s2 = s2; s.s3 = s3; s.s4 = s4;
-        //m1 = 0; m2 = 0; m3 = 0; m4 = 0;
-        //m.m1 = m1; m.m2 = m2; m.m3 = m3; m.m4 = m4;
+        //w1 = 0; w2 = 0; w3 = 0; w4 = 0;
+        //w.w1 = w1; w.w2 = w2; w.w3 = w3; w.w4 = w4;
         PublishAll();
       }
     }
@@ -681,13 +567,13 @@ void TeleopModesKey::PrintCmdReminders()
       puts("|            FWD            |  UP   :   q  |   w  |    e   |    r   |");
       puts("|             ^             | DOWN  :   a  |   s  |    d   |    f   |");
       puts("|  Rotate  <     >   Rotate |---------------------------------------|");
-      puts("|    CCW      v        CW   |   Moving Sensor:  |   Angle Steps:    |");
+      puts("|    CCW      v        CW   |   Moving Sensor:  |                   |");
       puts("|            RWD            |-------------------|-------------------|");
-      puts("|---------------------------|  UP     :    8    |  i : 10 deg/step  |");
-      puts("|     j  :  +10% throttle   |  DOWN   :    9    |  o :  1 deg/step  |");
-      puts("|     m  :  -10% throttle   |  RESET  :    0    |  p : .1 deg/step  |");
+      puts("|---------------------------|  UP     :    8    |   RIGHT  :   i    |");
+      puts("|     j  :  +10% throttle   |  RESET  :    9    |   RESET  :   o    |");
+      puts("|     m  :  -10% throttle   |  DOWN   :    0    |   LEFT   :   p    |");
       puts("|---------------------------|---------------------------------------|");
-      puts("|  space :  FULL STOP       | Lights OFF/LO/HI : Press L repeatedly |");
+      puts("|  space :  FULL STOP       | Angle Steps:  10/1/0.1 : Press 5/6/7  |");
       puts("|-------------------------------------------------------------------|");
     }
     break;  
@@ -706,13 +592,13 @@ void TeleopModesKey::PrintCmdReminders()
       puts("|  Steer   <     >   Steer  |  UP   :   q  |   w  |    e   |    r   |");
       puts("|  Left       v      Right  | DOWN  :   a  |   s  |    d   |    f   |");
       puts("|            RWD            |---------------------------------------|");
-      puts("|---------------------------|   Moving Sensor:  |   Angle Steps:    |");
+      puts("|---------------------------|   Moving Sensor:  |                   |");
       puts("|     z  :   Turn-In-Place  |-------------------|-------------------|");
-      puts("|    x-c :   Rotate CW-CCW  |  UP     :    8    |  i : 10 deg/step  |");
-      puts("|     j  :  +10% throttle   |  DOWN   :    9    |  o :  1 deg/step  |");
-      puts("|     m  :  -10% throttle   |  RESET  :    0    |  p : .1 deg/step  |");
+      puts("|    x-c :   Rotate CW-CCW  |  UP     :    8    |   RIGHT  :   i    |");
+      puts("|     j  :  +10% throttle   |  RESET  :    9    |   RESET  :   o    |");
+      puts("|     m  :  -10% throttle   |  DOWN   :    0    |   LEFT   :   p    |");
       puts("|---------------------------|---------------------------------------|");
-      puts("|  space :  FULL STOP       | Lights OFF/LO/HI : Press L repeatedly |");
+      puts("|  space :  FULL STOP       | Angle Steps:  10/1/0.1 : Press 5/6/7  |");
       puts("|-------------------------------------------------------------------|");
     }
     break; 
@@ -731,13 +617,13 @@ void TeleopModesKey::PrintCmdReminders()
       puts("|  Steer   <     >   Steer  |  UP   :   q  |   w  |    e   |    r   |");
       puts("|  Left       v      Right  | DOWN  :   a  |   s  |    d   |    f   |");
       puts("|            RWD            |---------------------------------------|");
-      puts("|---------------------------|   Moving Sensor:  |   Angle Steps:    |");
+      puts("|---------------------------|   Moving Sensor:  |                   |");
       puts("|      j  :  +10% throttle  |-------------------|-------------------|");
-      puts("|      m  :  -10% throttle  |  UP     :    8    |  i : 10 deg/step  |");
-      puts("|---------------------------|  DOWN   :    9    |  o :  1 deg/step  |");
-      puts("|   space :  FULL STOP      |  RESET  :    0    |  p : .1 deg/step  |");
+      puts("|      m  :  -10% throttle  |  UP     :    8    |   RIGHT  :   i    |");
+      puts("|---------------------------|  RESET  :    9    |   RESET  :   o    |");
+      puts("|   space :  FULL STOP      |  DOWN   :    0    |   LEFT   :   p    |");
       puts("|---------------------------|---------------------------------------|");
-      puts("| West Virginia University  | Lights OFF/LO/HI : Press L repeatedly |");
+      puts("| West Virginia University  | Angle Steps:  10/1/0.1 : Press 5/6/7  |");
       puts("|-------------------------------------------------------------------|");
     }
     break;
@@ -756,13 +642,13 @@ void TeleopModesKey::PrintCmdReminders()
       puts("|  Steer   <     >   Steer  |  UP   :   q  |   w  |    e   |    r   |");
       puts("|  Left       v      Right  | DOWN  :   a  |   s  |    d   |    f   |");
       puts("|            RWD            |---------------------------------------|");
-      puts("|---------------------------|   Moving Sensor:  |   Angle Steps:    |");
+      puts("|---------------------------|   Moving Sensor:  |                   |");
       puts("|      j  :  +10% throttle  |-------------------|-------------------|");
-      puts("|      m  :  -10% throttle  |  UP     :    8    |  i : 10 deg/step  |");
-      puts("|---------------------------|  DOWN   :    9    |  o :  1 deg/step  |");
-      puts("|   space :  FULL STOP      |  RESET  :    0    |  p : .1 deg/step  |");
+      puts("|      m  :  -10% throttle  |  UP     :    8    |   RIGHT  :   i    |");
+      puts("|---------------------------|  RESET  :    9    |   RESET  :   o    |");
+      puts("|   space :  FULL STOP      |  DOWN   :    0    |   LEFT   :   p    |");
       puts("|---------------------------|---------------------------------------|");
-      puts("| West Virginia University  | Lights OFF/LO/HI : Press L repeatedly |");
+      puts("| West Virginia University  | Angle Steps:  10/1/0.1 : Press 5/6/7  |");
       puts("|-------------------------------------------------------------------|");
     }
     break;    
@@ -777,7 +663,7 @@ void TeleopModesKey::PrintStatus()
     {
       puts("\033[2J\033[1;1H");
       ROS_WARN("Current Values\r");
-      printf("\rManipulator = (%2.1f,%2.1f,%2.1f,%2.1f) deg\t Sensor = %2.1f deg\t Step = %2.1f deg\n Throttle %2.2f /100| Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, step, throttle*100, key);
+      printf("\rManipulator = (%2.1f,%2.1f,%2.1f,%2.1f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.1f deg\n Throttle %2.2f /100| Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, key);
     }
     break;
 
@@ -789,13 +675,13 @@ void TeleopModesKey::PrintStatus()
         {
           case 0:
           {
-            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = %2.2f deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, step, throttle*100, s1*180/PI, key);
+            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
           }
           break;
 
           case 1:
           {
-            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = %2.2f deg\t Step = %2.2f deg\n Throttle %2.2f /100\t ROTATION | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, step, throttle*100, key);
+            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t ROTATION | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, key);
           }
           break;
         }
@@ -806,7 +692,7 @@ void TeleopModesKey::PrintStatus()
     {
       puts("\033[2J\033[1;1H");
       ROS_WARN("Current Values\r");
-      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = %2.2f deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, step, throttle*100, s1*180/PI, key);
+      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
     }
     break;
 
@@ -814,7 +700,7 @@ void TeleopModesKey::PrintStatus()
     {
       puts("\033[2J\033[1;1H");
       ROS_WARN("Current Values\r");
-      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = %2.2f deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, step, throttle*100, s1*180/PI, key);
+      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
     }
     break;
   }

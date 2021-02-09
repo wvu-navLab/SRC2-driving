@@ -1,17 +1,17 @@
 <launch>
+  <!-- scout_motion_control launch file -->
+  <include file="$(find motion_control)/launch/scout_motion_control.launch"/>
 
-  <group ns="scout_1">
+  <!-- scout_driving_tools launch file -->
+  <include file="$(find driving_tools)/launch/scout_driving_tools.launch"/>
 
-	  	<remap from="/toggle_light" to="toggle_light"/>
-    
-		<node pkg="teleop_modes"
-			name="teleop_modes"
-			type="teleop_modes_key"
-			output="screen">
-		</node>
-    
+  <group ns="small_scout_1">
+    <node name="teleop_modes_key" 
+      pkg="teleop_modes" 
+      type="teleop_modes_key"
+      respawn="false" 
+      output="screen"/>
   </group>
-
 </launch>
 
 

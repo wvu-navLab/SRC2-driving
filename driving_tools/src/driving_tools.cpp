@@ -13,8 +13,8 @@
 DrivingTools::DrivingTools()
 {
   // Publishers
-  pubMotorEfforts = nh_.advertise<motion_control::MotorGroup>("driving/motor_efforts", 1000);
-  pubSteeringEfforts = nh_.advertise<motion_control::SteeringGroup>("driving/steering_joint_angles", 1000);
+  pubWheelVels = nh_.advertise<motion_control::WheelGroup>("control/drive/wheel_velocities", 1000);
+  pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("control/steering/joint_angles", 1000);
   pubDrivingMode = nh_.advertise<std_msgs::Int64>("driving/driving_mode", 1);
 
   // Service Servers
@@ -43,21 +43,21 @@ bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, dri
 
   double throttle = req.throttle;
   // Grab the directional data
-  m1 = - throttle * MAX_MOTOR_EFFORT;
-  m2 = - throttle * MAX_MOTOR_EFFORT;
-  m3 = throttle * MAX_MOTOR_EFFORT;
-  m4 = throttle * MAX_MOTOR_EFFORT;
+  w1 = - throttle * MAX_MOTOR_EFFORT;
+  w2 = - throttle * MAX_MOTOR_EFFORT;
+  w3 = throttle * MAX_MOTOR_EFFORT;
+  w4 = throttle * MAX_MOTOR_EFFORT;
 
-  m.m1 = m1;
-  m.m2 = m2;
-  m.m3 = m3;
-  m.m4 = m4;
+  w.w1 = w1;
+  w.w2 = w2;
+  w.w3 = w3;
+  w.w4 = w4;
 
   std_msgs::Int64 mode;
   mode.data = driving_mode_;
   pubDrivingMode.publish(mode);
-  pubMotorEfforts.publish(m);
-  pubSteeringEfforts.publish(s);
+  pubWheelVels.publish(w);
+  pubSteeringAngles.publish(s);
 
   res.success = true;
   return true;
@@ -83,21 +83,21 @@ bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Req
 
   double throttle = req.throttle;
   // Grab the directional data
-  m1 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
-  m2 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
-  m3 = - throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
-  m4 = - throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
+  w1 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
+  w2 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
+  w3 = - throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
+  w4 = - throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
 
-  m.m1 = m1;
-  m.m2 = m2;
-  m.m3 = m3;
-  m.m4 = m4;
+  w.w1 = w1;
+  w.w2 = w2;
+  w.w3 = w3;
+  w.w4 = w4;
 
   std_msgs::Int64 mode;
   mode.data = driving_mode_;
   pubDrivingMode.publish(mode);
-  pubMotorEfforts.publish(m);
-  pubSteeringEfforts.publish(s);
+  pubWheelVels.publish(w);
+  pubSteeringAngles.publish(s);
   res.success = true;
   return true;
 }
@@ -120,21 +120,21 @@ bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, drivin
 
   double throttle = req.throttle;
   // Grab the directional data
-  m1 = throttle * MAX_MOTOR_EFFORT;
-  m2 = throttle * MAX_MOTOR_EFFORT;
-  m3 = throttle * MAX_MOTOR_EFFORT;
-  m4 = throttle * MAX_MOTOR_EFFORT;
+  w1 = throttle * MAX_MOTOR_EFFORT;
+  w2 = throttle * MAX_MOTOR_EFFORT;
+  w3 = throttle * MAX_MOTOR_EFFORT;
+  w4 = throttle * MAX_MOTOR_EFFORT;
 
-  m.m1 = m1;
-  m.m2 = m2;
-  m.m3 = m3;
-  m.m4 = m4;
+  w.w1 = w1;
+  w.w2 = w2;
+  w.w3 = w3;
+  w.w4 = w4;
 
   std_msgs::Int64 mode;
   mode.data = driving_mode_;
   pubDrivingMode.publish(mode);
-  pubMotorEfforts.publish(m);
-  pubSteeringEfforts.publish(s);
+  pubWheelVels.publish(w);
+  pubSteeringAngles.publish(s);
 
   res.success = true;
   return true;
@@ -160,7 +160,7 @@ bool DrivingTools::TurnWheelsSideways(driving_tools::TurnWheelsSideways::Request
   std_msgs::Int64 mode;
   mode.data = driving_mode_;
   pubDrivingMode.publish(mode);
-  pubSteeringEfforts.publish(s);
+  pubSteeringAngles.publish(s);
 
   res.success = true;
   return true;
@@ -184,21 +184,21 @@ bool DrivingTools::MoveSideways(driving_tools::MoveSideways::Request  &req, driv
 
   double throttle = req.throttle;
   // Grab the directional data
-  m1 = throttle * MAX_MOTOR_EFFORT;
-  m2 = throttle * MAX_MOTOR_EFFORT;
-  m3 = throttle * MAX_MOTOR_EFFORT;
-  m4 = throttle * MAX_MOTOR_EFFORT;
+  w1 = throttle * MAX_MOTOR_EFFORT;
+  w2 = throttle * MAX_MOTOR_EFFORT;
+  w3 = throttle * MAX_MOTOR_EFFORT;
+  w4 = throttle * MAX_MOTOR_EFFORT;
 
-  m.m1 = m1;
-  m.m2 = m2;
-  m.m3 = m3;
-  m.m4 = m4;
+  w.w1 = w1;
+  w.w2 = w2;
+  w.w3 = w3;
+  w.w4 = w4;
 
   std_msgs::Int64 mode;
   mode.data = driving_mode_;
   pubDrivingMode.publish(mode);
-  pubMotorEfforts.publish(m);
-  pubSteeringEfforts.publish(s);
+  pubWheelVels.publish(w);
+  pubSteeringAngles.publish(s);
 
   res.success = true;
   return true;
@@ -216,16 +216,16 @@ bool DrivingTools::Stop(driving_tools::Stop::Request  &req, driving_tools::Stop:
     s.s3 = 0;
     s.s4 = 0;
 
-    m.m1 = 0;
-    m.m2 = 0;
-    m.m3 = 0;
-    m.m4 = 0;
+    w.w1 = 0;
+    w.w2 = 0;
+    w.w3 = 0;
+    w.w4 = 0;
 
     std_msgs::Int64 mode;
     mode.data = driving_mode_;
     pubDrivingMode.publish(mode);
-    pubMotorEfforts.publish(m);
-    pubSteeringEfforts.publish(s);
+    pubWheelVels.publish(w);
+    pubSteeringAngles.publish(s);
 
     res.success = true;
   }

@@ -27,12 +27,11 @@
 #include <ros/ros.h>
 
 // Custom message includes. Auto-generated from msg/ directory.
-#include <motion_control/JointGroup.h>
-#include <motion_control/MotorGroup.h>
+#include <motion_control/ArmGroup.h>
+#include <motion_control/WheelGroup.h>
 #include <motion_control/SteeringGroup.h>
-#include <motion_control/SensorJoint.h>
+#include <motion_control/SensorGroup.h>
 #include <motion_control/BinJoint.h>
-#include <srcp2_msgs/ToggleLightSrv.h>
 #define PI 3.14159265
 
 //Keycodes (see https://github.com/simlabrobotics/allegro_hand_ros/blob/master/allegro_hand_keyboard/src/AllegroHand_keyboard.cpp)
@@ -132,14 +131,20 @@
  * \def JOINT LIMITS
  */
 
-#define JOINT1_MAX PI
-#define JOINT1_MIN -PI
-#define JOINT2_MAX PI/3
-#define JOINT2_MIN -PI/5
-#define JOINT3_MAX PI/3
-#define JOINT3_MIN -PI/3
-#define JOINT4_MAX 5*PI/4
-#define JOINT4_MIN 0
+#define ARM1_MAX PI
+#define ARM1_MIN -PI
+#define ARM2_MAX 3*PI/8
+#define ARM2_MIN -3*PI/8
+#define ARM3_MAX PI/4
+#define ARM3_MIN -PI/4
+#define ARM4_MAX 2*PI/3
+#define ARM4_MIN -2*PI/3
+#define SENSOR1_MAX PI
+#define SENSOR1_MIN -PI
+#define SENSOR2_MAX PI/3
+#define SENSOR2_MIN -PI/3
+#define BIN_MAX 3*PI/4
+#define BIN_MIN 0
 
 /*!
  * \class TeleopModesKey
@@ -199,18 +204,17 @@ private:
   ros::NodeHandle & nh_;
   
   // Create oublishers
-  ros::Publisher pubJointAngles;      /*!< Publisher of joint angles */
-  ros::Publisher pubMotorEfforts;     /*!< Publisher of joint angles */
+  ros::Publisher pubArmAngles;      /*!< Publisher of joint angles */
+  ros::Publisher pubWheelVels;     /*!< Publisher of joint angles */
   ros::Publisher pubSteeringAngles;  /*!< Publisher of joint angles */
-  ros::Publisher pubSensorAngle;      /*!< Publisher of joint angles */
+  ros::Publisher pubSensorAngles;      /*!< Publisher of joint angles */
   ros::Publisher pubBinAngle;         /*!< Publisher of joint angles */
-  ros::ServiceClient clientLights;         /*!< Publisher of joint angles */
 
   // Create output messages
-  motion_control::JointGroup q;       /*!< Publisher of joint angles */
-  motion_control::MotorGroup m;       /*!< Publisher of joint angles */
+  motion_control::ArmGroup q;       /*!< Publisher of joint angles */
+  motion_control::WheelGroup w;       /*!< Publisher of joint angles */
   motion_control::SteeringGroup s;    /*!< Publisher of joint angles */
-  motion_control::SensorJoint j;      /*!< Publisher of joint angles */
+  motion_control::SensorGroup j;      /*!< Publisher of joint angles */
   motion_control::BinJoint b;         /*!< Publisher of joint angles */
 
   int mode; /*!< the controller mode */
@@ -219,10 +223,10 @@ private:
   double throttle = 0;  /*!< Init factor for motor efforts variables */
   double step = 1;      /*!< Init factor for angle changes variables */
 
-  double j1 = 0;                                                /*!< Init sensor variable */
+  double j1 = 0, j2 = 0;                                                /*!< Init sensor variable */
   double s1 = 0; double s2 = 0; double s3 = 0; double s4 = 0;   /*!< Init steering variables */
-  double m1 = 0; double m2 = 0; double m3 = 0; double m4 = 0;   /*!< Init driving variables */
-  double q1 = 0; double q2 = JOINT2_MIN; double q3 = JOINT3_MAX; double q4 = JOINT4_MAX;   /*!< Init manipulation variables */
+  double w1 = 0; double w2 = 0; double w3 = 0; double w4 = 0;   /*!< Init driving variables */
+  double q1 = 0; double q2 = ARM2_MIN; double q3 = ARM3_MAX; double q4 = ARM4_MAX;   /*!< Init manipulation variables */
   double b1 = 0;                                                /*!< Init bin variables */
 
   // Map for mode keys
@@ -237,19 +241,20 @@ private:
   // Map for sensor, bin and manipulator joints and light toggle keys
   std::map<char, std::vector<float>> sensorBindings
   {
-    {KEYCODE_8, {1}},
-    {KEYCODE_9, {-1}},
-    {KEYCODE_0, {0}}
+    {KEYCODE_8, {1, 0}},
+    {KEYCODE_9, {0, 0}},
+    {KEYCODE_0, {-1, 0}},
+    {KEYCODE_i, {0, 1}},
+    {KEYCODE_o, {0, 0}},
+    {KEYCODE_p, {0, -1}}
   };
-  std::map<char, std::vector<float>> lightBindings
-  {
-    {KEYCODE_l, {1}}
-  };
+
   std::map<char, std::vector<float>> binBindings
   {
     {KEYCODE_CTRL, {1}},
     {KEYCODE_ALT, {-1}}
   };
+  
   std::map<char, std::vector<float>> manipulatorBindings
   {
     {KEYCODE_q, {1, 0, 0, 0}},
@@ -265,9 +270,9 @@ private:
   // Map for step keys
   std::map<char, std::vector<float>> stepBindings
   {
-    {KEYCODE_i, {10}},
-    {KEYCODE_o, {1.0}},
-    {KEYCODE_p, {0.1}}
+    {KEYCODE_5, {10}},
+    {KEYCODE_6, {1.0}},
+    {KEYCODE_7, {0.1}}
   };
   // Map for drive keys
   std::map<char, std::vector<float>> throttleBindings

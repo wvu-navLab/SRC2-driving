@@ -5,15 +5,13 @@
   <!-- hauler_driving_tools launch file -->
   <include file="$(find driving_tools)/launch/hauler_driving_tools.launch"/>
 
-  <arg name="robot_namespace" default="/hauler_1"/>
-
-	<remap from="/toggle_light" to="$(arg robot_namespace)/toggle_light"/>  
-  <node name="teleop_modes_key" 
-	pkg="teleop_modes" 
-	type="teleop_modes_key"
-	respawn="false" 
-	output="screen" 
-	ns="$(arg robot_namespace)"/>
+	<group ns="small_hauler_1">
+    <node name="teleop_modes_key" 
+      pkg="teleop_modes" 
+      type="teleop_modes_key"
+      respawn="false" 
+      output="screen"/>
+  </group>
 
 </launch>
 

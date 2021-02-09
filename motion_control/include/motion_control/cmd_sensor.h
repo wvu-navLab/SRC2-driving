@@ -6,7 +6,7 @@
 #include "std_msgs/Float64.h"
 
 // Custom message includes. Auto-generated from msg/ directory.
-#include "motion_control/SensorJoint.h"
+#include "motion_control/SensorGroup.h"
 
 class SensorCommander
 {
@@ -18,16 +18,18 @@ public:
   ~SensorCommander();
 
   //! Callback function for subscriber.
-  void messageCallback(const motion_control::SensorJoint::ConstPtr &msg);
+  void messageCallback(const motion_control::SensorGroup::ConstPtr &msg);
 
   //! Joint angles
   std_msgs::Float64 j1;
+  std_msgs::Float64 j2;
 
 private:
   // Node Handle
   ros::NodeHandle & nh_;
   
-  ros::Publisher pub_;
+  ros::Publisher pub1_;
+  ros::Publisher pub2_; 
   ros::Subscriber sub_;  
 };
 

@@ -52,10 +52,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  JointGroup.msg
-  MotorGroup.msg
+  ArmGroup.msg
+  WheelGroup.msg
   SteeringGroup.msg
-  SensorJoint.msg
+  SensorGroup.msg
   BinJoint.msg
 )
 
@@ -130,7 +130,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/cmd_joints.cpp
+#   src/cmd_arm.cpp
 #   src/cmd_sensor.cpp
 #   src/cmd_bin.cpp
 #   src/cmd_motors.cpp
@@ -146,9 +146,9 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-add_executable(cmd_joints src/cmd_joints.cpp)
-target_link_libraries(cmd_joints ${catkin_LIBRARIES})
-add_dependencies(cmd_joints motion_control_generate_messages_cpp)
+add_executable(cmd_arm src/cmd_arm.cpp)
+target_link_libraries(cmd_arm ${catkin_LIBRARIES})
+add_dependencies(cmd_arm motion_control_generate_messages_cpp)
 
 add_executable(cmd_sensor src/cmd_sensor.cpp)
 target_link_libraries(cmd_sensor ${catkin_LIBRARIES})
@@ -158,9 +158,9 @@ add_executable(cmd_bin src/cmd_bin.cpp)
 target_link_libraries(cmd_bin ${catkin_LIBRARIES})
 add_dependencies(cmd_bin motion_control_generate_messages_cpp)
 
-add_executable(cmd_motors src/cmd_motors.cpp)
-target_link_libraries(cmd_motors ${catkin_LIBRARIES})
-add_dependencies(cmd_motors motion_control_generate_messages_cpp)
+add_executable(cmd_wheels src/cmd_wheels.cpp)
+target_link_libraries(cmd_wheels ${catkin_LIBRARIES})
+add_dependencies(cmd_wheels motion_control_generate_messages_cpp)
 
 add_executable(cmd_steering src/cmd_steering.cpp)
 target_link_libraries(cmd_steering ${catkin_LIBRARIES})

@@ -19,7 +19,7 @@
 #include <ros/console.h>
 
 // Custom message includes. Auto-generated from msg/ directory.
-#include <motion_control/MotorGroup.h>
+#include <motion_control/WheelGroup.h>
 #include <motion_control/SteeringGroup.h>
 #include <driving_tools/Stop.h>
 #include <driving_tools/RotateInPlace.h>
@@ -74,8 +74,8 @@ private:
     ros::NodeHandle nh_;
 
     // Publishers
-    ros::Publisher pubMotorEfforts;
-    ros::Publisher pubSteeringEfforts;
+    ros::Publisher pubWheelVels;
+    ros::Publisher pubSteeringAngles;
 
     // Service Servers
     ros::ServiceServer stopServer;
@@ -89,10 +89,10 @@ private:
     ros::Publisher pubDrivingMode;
 
     // Create output messages
-    motion_control::MotorGroup m;       /*!< Publisher of motor efforts */
+    motion_control::WheelGroup w;       /*!< Publisher of motor efforts */
     motion_control::SteeringGroup s;    /*!< Publisher of steering angles */   
     double s1 = 0; double s2 = 0; double s3 = 0; double s4 = 0;   /*!< Init steering variables */
-    double m1 = 0; double m2 = 0; double m3 = 0; double m4 = 0;   /*!< Init driving variables */
+    double w1 = 0; double w2 = 0; double w3 = 0; double w4 = 0;   /*!< Init driving variables */
     int driving_mode_;
 
 public:

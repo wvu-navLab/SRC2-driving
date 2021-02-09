@@ -28,7 +28,7 @@
 #include <std_msgs/Int64.h>
 #include <geometry_msgs/Twist.h>
 #include <motion_control/SteeringGroup.h>
-#include <driving_control/WheelVelCmds.h>
+#include <motion_control/WheelGroup.h>
 #include <driving_tools/Stop.h>
 #include <rosgraph_msgs/Clock.h>
 
@@ -65,7 +65,7 @@ private:
     ros::Subscriber subCmdVel;
 
     // Publisher
-    ros::Publisher pubWheelVelCmds;
+    ros::Publisher pubWheelVels;
     ros::Publisher pubSteeringAngles;
     ros::Publisher pubDrivingMode;
 
@@ -73,7 +73,8 @@ private:
     ros::ServiceClient clientStop;
 
     // Name string
-    std::string name_;
+    std::string robot_name_;
+    std::string node_name_;
 
     /// Velocity command related:
     struct Command

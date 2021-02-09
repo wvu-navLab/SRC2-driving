@@ -5,20 +5,17 @@
   <!-- scout_driving_tools launch file -->
   <include file="$(find driving_tools)/launch/scout_driving_tools.launch"/>
 
-  <group ns="scout_1">
-
-    <param name="/use_sim_time" value="true"/>
-
-    <node pkg="driving_control"
-          name="wheel_control"
-          type="wheel_control"
-          output="screen">
-    </node>
-
+  <group ns="small_scout_1">
+  
     <node pkg="driving_control"
           name="fws_driving"
           type="fws_driving"
           output="screen">
+      <rosparam
+        command="load"
+        file="$(find driving_control)/config/scout_driving_control.yaml"
+        subst_value="true"
+      />
     </node>
 
   </group>

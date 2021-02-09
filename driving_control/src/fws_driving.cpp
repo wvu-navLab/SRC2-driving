@@ -25,19 +25,57 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     , enable_twist_cmd_(true)
 {
 
-    name_ = "fws_driving";
+    node_name_ = "fws_driving";
 
-    nh_.getParam("joint_state_controller/publish_rate", joint_state_controller_publish_rate_);
-    nh_.getParam("/max_velocity", max_velocity_);
-    nh_.getParam("/wheel_radius", wheel_radius_);
-    nh_.getParam("/wheel_separation_length", wheel_separation_length_);
-    nh_.getParam("/wheel_separation_width", wheel_separation_width_);
-
-    ROS_INFO_STREAM("joint_state_controller/publish_rate" << joint_state_controller_publish_rate_);
-    ROS_INFO_STREAM("/max_velocity" << max_velocity_);
-    ROS_INFO_STREAM("/wheel_radius" << wheel_radius_);
-    ROS_INFO_STREAM("/wheel_separation_length" << wheel_separation_length_);
-    ROS_INFO_STREAM("/wheel_separation_width" << wheel_separation_width_);
+    // Read params from yaml file
+    if (ros::param::get(node_name_ + "/robot_name", robot_name_) == false)
+    {
+        ROS_FATAL("No parameter 'robot_name' specified");
+        ros::shutdown();
+        exit(1);
+    }
+    if(ros::param::get(node_name_+"/joint_state_controller_publish_rate",joint_state_controller_publish_rate_)==false)
+    {
+      ROS_FATAL("No parameter 'joint_state_controller_publish_rate' specified");
+      ros::shutdown();
+      exit(1);
+    }
+    if(ros::param::get(node_name_+"/max_velocity",max_velocity_)==false)
+    {
+      ROS_FATAL("No parameter 'max_velocity' specified");
+      ros::shutdown();
+      exit(1);
+    }
+    if(ros::param::get(node_name_+"/wheel_radius",wheel_radius_)==false)
+    {
+      ROS_FATAL("No parameter 'wheel_radius' specified");
+      ros::shutdown();
+      exit(1);
+    }
+    if(ros::param::get(node_name_+"/wheel_separation_length",wheel_separation_length_)==false)
+    {
+      ROS_FATAL("No parameter 'wheel_separation_length' specified");
+      ros::shutdown();
+      exit(1);
+    }
+    if(ros::param::get(node_name_+"/wheel_separation_width",wheel_separation_width_)==false)
+    {
+      ROS_FATAL("No parameter 'wheel_separation_width' specified");
+      ros::shutdown();
+      exit(1);
+    }
+    if(ros::param::get(node_name_+"/wheel_steering_y_offset",wheel_steering_y_offset_)==false)
+    {
+      ROS_FATAL("No parameter 'wheel_steering_y_offset' specified");
+      ros::shutdown();
+      exit(1);
+    }
+    if(ros::param::get(node_name_+"/cmd_vel_timeout",cmd_vel_timeout_)==false)
+    {
+      ROS_FATAL("No parameter 'cmd_vel_timeout' specified");
+      ros::shutdown();
+      exit(1);
+    }
 
     clientStop = nh_.serviceClient<driving_tools::Stop>("stop");
 
@@ -45,10 +83,9 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     subCmdVel = nh_.subscribe("driving/cmd_vel", 1, &FourWheelSteeringDriving::cmdVelCallback, this);
 
     // Publishers
-    pubWheelVelCmds = nh_.advertise<driving_control::WheelVelCmds>("driving/wheel_vel_cmds", 1);
-    pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("driving/steering_joint_angles", 1);
+    pubWheelVels = nh_.advertise<motion_control::WheelGroup>("control/drive/wheel_velocities", 1);
+    pubSteeringAngles = nh_.advertise<motion_control::SteeringGroup>("control/steering/joint_angles", 1);
     pubDrivingMode = nh_.advertise<std_msgs::Int64>("driving/driving_mode", 1);
-
 
     ROS_INFO_STREAM("cmd stamp:"<<command_struct_twist_.stamp);
 }
@@ -86,7 +123,7 @@ void FourWheelSteeringDriving::cmdVelCallback(const geometry_msgs::Twist& comman
     command_struct_twist_.lin_y   = command.linear.y;
     command_struct_twist_.stamp = ros::Time::now();
     command_twist_.writeFromNonRT (command_struct_twist_);
-    ROS_DEBUG_STREAM_NAMED(name_,
+    ROS_DEBUG_STREAM_NAMED(robot_name_,
                             "Added values to command. "
                             << "Ang: "   << command_struct_twist_.ang << ", "
                             << "Lin x: " << command_struct_twist_.lin_x << ", "
@@ -218,12 +255,12 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
             }
 
             // Set wheels velocities:
-            driving_control::WheelVelCmds w;
+            motion_control::WheelGroup w;
             w.w1 = vel_right_front; //fr_wheel_joint
             w.w2 = vel_right_rear; //br_wheel_joint
             w.w3 = vel_left_front; //fl_wheel_joint
             w.w4 = vel_left_rear; //bl_wheel_joint
-            pubWheelVelCmds.publish(w);
+            pubWheelVels.publish(w);
             // ROS_INFO_STREAM("Wheel velocities commanded" << w);
 
             /// TODO check limits to not apply the same steering on right and left when saturated !
