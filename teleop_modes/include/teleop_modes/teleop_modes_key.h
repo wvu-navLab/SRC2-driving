@@ -251,8 +251,8 @@ private:
 
   std::map<char, std::vector<float>> binBindings
   {
-    {KEYCODE_CTRL, {1}},
-    {KEYCODE_ALT, {-1}}
+    {KEYCODE_y, {1}},
+    {KEYCODE_h, {-1}}
   };
   
   std::map<char, std::vector<float>> manipulatorBindings
