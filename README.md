@@ -18,7 +18,7 @@ source ~/ros_workspace/install/setup.bash
 Download the SRC2_driving stack. 
 
 ```
-cd ~/srcp2-final-public/cmp_workspace/src
+cd ~/cmp_workspace/src
 git clone https://github.com/wvu-navLab/SRC2-driving.git
 ```
 
@@ -36,10 +36,12 @@ Use the launch files substituting the parameter `{rover_type}`:`scout`, `excavat
 
 To run the teleop:
 ```
+export ROS_MASTER_URI=http://172.18.0.2:11311
 roslaunch teleop_modes {rover_type}_teleop_modes
 ```
 
 To run the 4WS controllers:
 ```
+export ROS_MASTER_URI=http://172.18.0.2:11311
 roslaunch driving_control {rover_type}_driving_control
 ```
