@@ -10,22 +10,23 @@
 
 ## Installing the packages
 
-Open another terminal and login to Docker enviroment.
+Open another terminal and download the SRC2_driving stack. 
+
+```
+cd ~/srcp2-final-public/cmp_workspace/src
+git clone https://github.com/wvu-navLab/SRC2-driving.git
+```
+
+Login to Docker enviroment.
 ```
 ~/srcp2-final-public/docker/scripts/run_comp_final -d -i
 source ~/ros_workspace/install/setup.bash
-```
-Download the SRC2_driving stack. 
-
-```
-cd ~/cmp_workspace/src
-git clone https://github.com/wvu-navLab/SRC2-driving.git
 ```
 
 Build and source the packages.
 
 ```
-cd ..
+cd ~/cmp_workspace/src
 catkin build
 source devel/setup.bash
 ```
