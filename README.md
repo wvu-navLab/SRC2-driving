@@ -26,7 +26,7 @@ source ~/ros_workspace/install/setup.bash
 Build and source the packages.
 
 ```
-cd ~/cmp_workspace/src
+cd ~/cmp_workspace
 catkin build
 source devel/setup.bash
 ```
