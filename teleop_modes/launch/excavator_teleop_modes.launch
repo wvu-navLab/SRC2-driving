@@ -5,7 +5,7 @@
   <!-- excavator_driving_tools launch file -->
   <include file="$(find driving_tools)/launch/excavator_driving_tools.launch"/>
         
-	<group ns="small_excavator_1">
+  <group ns="small_excavator_1">
     <node name="teleop_modes_key" 
       pkg="teleop_modes" 
       type="teleop_modes_key"

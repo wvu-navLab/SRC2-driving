@@ -135,7 +135,7 @@
 #define ARM1_MIN -PI
 #define ARM2_MAX 3*PI/8
 #define ARM2_MIN -3*PI/8
-#define ARM3_MAX PI/4
+#define ARM3_MAX 7*PI/8
 #define ARM3_MIN -PI/4
 #define ARM4_MAX 2*PI/3
 #define ARM4_MIN -2*PI/3

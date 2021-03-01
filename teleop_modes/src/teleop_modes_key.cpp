@@ -100,7 +100,7 @@ void TeleopModesKey::ResolveKey()
       // If the key corresponds to a key in sensorBindings
       else if (sensorBindings.count(key) == 1)
       {
-        if (key == KEYCODE_0)
+        if (key == KEYCODE_9)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
@@ -197,7 +197,7 @@ void TeleopModesKey::ResolveKey()
       // If the key corresponds to a key in sensorBindings
       else if (sensorBindings.count(key) == 1)
       {
-        if (key == KEYCODE_0)
+        if (key == KEYCODE_9)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
@@ -338,7 +338,7 @@ void TeleopModesKey::ResolveKey()
       }
       else if (sensorBindings.count(key) == 1)
       {
-        if (key == KEYCODE_0)
+        if (key == KEYCODE_9)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
@@ -448,7 +448,7 @@ void TeleopModesKey::ResolveKey()
       // If the key corresponds to a key in sensorBindings
       else if (sensorBindings.count(key) == 1)
       {
-        if (key == KEYCODE_0)
+        if (key == KEYCODE_9)
         {
           // Grab the change and update the current joint angles message
           j1 = 0;
