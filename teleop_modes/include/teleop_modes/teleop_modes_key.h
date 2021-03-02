@@ -139,10 +139,10 @@
 #define ARM3_MIN -PI/4
 #define ARM4_MAX 2*PI/3
 #define ARM4_MIN -2*PI/3
-#define SENSOR1_MAX PI
-#define SENSOR1_MIN -PI
-#define SENSOR2_MAX PI/3
-#define SENSOR2_MIN -PI/3
+#define SENSOR1_MAX PI/3
+#define SENSOR1_MIN -PI/3
+#define SENSOR2_MAX PI
+#define SENSOR2_MIN -PI
 #define BIN_MAX 3*PI/4
 #define BIN_MIN 0
 

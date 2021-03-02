@@ -27,7 +27,7 @@ TeleopModesKey::TeleopModesKey(ros::NodeHandle & nh)
 
   // Initialize teleop with zero commands
   j.j1 = 0; j.j2 = 0;
-  q.q1 = 0; q.q2 =  ARM2_MIN; q.q3 = ARM3_MAX; q.q4 = ARM4_MAX; // Arm will move to HOME_MODE
+  q.q1 = 0; q.q2 =  ARM2_MIN; q.q3 = ARM3_MAX; q.q4 = ARM4_MIN; // Arm will move to HOME_MODE
   w.w1 = 0; w.w2 = 0; w.w3 = 0; w.w4 = 0;
   s.s1 = 0; s.s2 = 0; s.s3 = 0; s.s4 = 0;
   b.b1 = 0;
