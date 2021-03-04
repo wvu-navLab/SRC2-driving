@@ -10,13 +10,13 @@ WheelsCommander::WheelsCommander(ros::NodeHandle & nh)
 {      
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("control/drive/wheel_velocities", 1000, &WheelsCommander::messageCallback, this);
+  sub_ = nh_.subscribe("control/drive/wheel_velocities", 10, &WheelsCommander::messageCallback, this);
 
   // Node publishes individual joint positions
-  pub1_ = nh_.advertise<std_msgs::Float64>("front_right_wheel/drive/command/velocity", 1000);
-  pub2_ = nh_.advertise<std_msgs::Float64>("back_right_wheel/drive/command/velocity", 1000);
-  pub3_ = nh_.advertise<std_msgs::Float64>("front_left_wheel/drive/command/velocity", 1000);
-  pub4_ = nh_.advertise<std_msgs::Float64>("back_left_wheel/drive/command/velocity", 1000);
+  pub1_ = nh_.advertise<std_msgs::Float64>("front_right_wheel/drive/command/velocity", 10);
+  pub2_ = nh_.advertise<std_msgs::Float64>("back_right_wheel/drive/command/velocity", 10);
+  pub3_ = nh_.advertise<std_msgs::Float64>("front_left_wheel/drive/command/velocity", 10);
+  pub4_ = nh_.advertise<std_msgs::Float64>("back_left_wheel/drive/command/velocity", 10);
 } // end WheelsCommander()
 
 /*--------------------------------------------------------------------

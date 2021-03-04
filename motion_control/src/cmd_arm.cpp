@@ -11,13 +11,13 @@ ArmCommander::ArmCommander(ros::NodeHandle & nh)
 
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("control/arm/joint_angles", 1000, &ArmCommander::messageCallback, this);
+  sub_ = nh_.subscribe("control/arm/joint_angles", 10, &ArmCommander::messageCallback, this);
 
   // Node publishes individual joint positions
-  pub1_ = nh_.advertise<std_msgs::Float64>("arm/shoulder_yaw/command/position", 1000);
-  pub2_ = nh_.advertise<std_msgs::Float64>("arm/shoulder_pitch/command/position", 1000);
-  pub3_ = nh_.advertise<std_msgs::Float64>("arm/elbow_pitch/command/position", 1000);
-  pub4_ = nh_.advertise<std_msgs::Float64>("arm/wrist_pitch/command/position", 1000);
+  pub1_ = nh_.advertise<std_msgs::Float64>("arm/shoulder_yaw/command/position", 10);
+  pub2_ = nh_.advertise<std_msgs::Float64>("arm/shoulder_pitch/command/position", 10);
+  pub3_ = nh_.advertise<std_msgs::Float64>("arm/elbow_pitch/command/position", 10);
+  pub4_ = nh_.advertise<std_msgs::Float64>("arm/wrist_pitch/command/position", 10);
 } // end ArmCommander()
 
 /*--------------------------------------------------------------------

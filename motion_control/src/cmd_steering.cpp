@@ -10,13 +10,13 @@ SteeringCommander::SteeringCommander(ros::NodeHandle & nh)
 {    
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("control/steering/joint_angles", 1000, &SteeringCommander::messageCallback, this);
+  sub_ = nh_.subscribe("control/steering/joint_angles", 10, &SteeringCommander::messageCallback, this);
 
   // Node publishes individual joint positions
-  pub1_ = nh_.advertise<std_msgs::Float64>("front_right_wheel/steer/command/position", 1000);
-  pub2_ = nh_.advertise<std_msgs::Float64>("back_right_wheel/steer/command/position", 1000);
-  pub3_ = nh_.advertise<std_msgs::Float64>("front_left_wheel/steer/command/position", 1000);
-  pub4_ = nh_.advertise<std_msgs::Float64>("back_left_wheel/steer/command/position", 1000);
+  pub1_ = nh_.advertise<std_msgs::Float64>("front_right_wheel/steer/command/position", 10);
+  pub2_ = nh_.advertise<std_msgs::Float64>("back_right_wheel/steer/command/position", 10);
+  pub3_ = nh_.advertise<std_msgs::Float64>("front_left_wheel/steer/command/position", 10);
+  pub4_ = nh_.advertise<std_msgs::Float64>("back_left_wheel/steer/command/position", 10);
 } // end SteeringCommander()
 
 /*--------------------------------------------------------------------

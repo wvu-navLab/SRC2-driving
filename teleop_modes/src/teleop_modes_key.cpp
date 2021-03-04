@@ -663,7 +663,7 @@ void TeleopModesKey::PrintStatus()
     {
       puts("\033[2J\033[1;1H");
       ROS_WARN("Current Values\r");
-      printf("\rManipulator = (%2.1f,%2.1f,%2.1f,%2.1f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.1f deg\n Throttle %2.2f /100| Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, key);
+      printf("\rManipulator = (%2.1f,%2.1f,%2.1f,%2.1f) deg\t Bin = (%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.1f deg\n Throttle %2.2f /100| Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, b1*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, key);
     }
     break;
 
@@ -675,13 +675,13 @@ void TeleopModesKey::PrintStatus()
         {
           case 0:
           {
-            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
+            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Bin = (%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, b1*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
           }
           break;
 
           case 1:
           {
-            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t ROTATION | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, key);
+            printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Bin = (%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t ROTATION | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, b1*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, key);
           }
           break;
         }
@@ -692,7 +692,7 @@ void TeleopModesKey::PrintStatus()
     {
       puts("\033[2J\033[1;1H");
       ROS_WARN("Current Values\r");
-      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
+      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Bin = (%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, b1*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
     }
     break;
 
@@ -700,7 +700,7 @@ void TeleopModesKey::PrintStatus()
     {
       puts("\033[2J\033[1;1H");
       ROS_WARN("Current Values\r");
-      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
+      printf("\rManipulator = (%2.2f,%2.2f,%2.2f,%2.2f) deg\t Bin = (%2.2f) deg\t Sensor = (%2.2f,%2.2f) deg\t Step = %2.2f deg\n Throttle %2.2f /100\t Steering = %2.2f | Last command: %c .\n", q1*180/PI, q2*180/PI, q3*180/PI, q4*180/PI, b1*180/PI, j1*180/PI, j2*180/PI, step, throttle*100, s1*180/PI, key);
     }
     break;
   }

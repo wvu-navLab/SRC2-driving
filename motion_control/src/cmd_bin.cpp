@@ -10,10 +10,10 @@ BinCommander::BinCommander(ros::NodeHandle & nh)
 {     
   // Create a subscriber.
   // Name the topic, message queue, callback function with class name, and object containing callback function.
-  sub_ = nh_.subscribe("control/bin/joint_angle", 1000, &BinCommander::messageCallback, this);
+  sub_ = nh_.subscribe("control/bin/joint_angle", 10, &BinCommander::messageCallback, this);
 
   // Node publishes individual joint positions
-  pub_ = nh_.advertise<std_msgs::Float64>("bin_controller/command", 1000);
+  pub_ = nh_.advertise<std_msgs::Float64>("bin/command/position", 10);
 } // end BinCommander()
 
 /*--------------------------------------------------------------------
