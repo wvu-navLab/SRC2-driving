@@ -74,11 +74,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -146,7 +146,7 @@ include_directories(
 
 add_executable(fws_driving src/fws_driving.cpp)
 target_link_libraries(fws_driving ${catkin_LIBRARIES})
-add_dependencies(fws_driving driving_control_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+add_dependencies(fws_driving ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
