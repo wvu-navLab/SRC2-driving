@@ -41,12 +41,12 @@ bool DrivingTools::RotateInPlace(driving_tools::RotateInPlace::Request &req, dri
   s.s3 = s3;
   s.s4 = s4;
 
-  double throttle = req.throttle;
+  double speed_ratio = req.speed_ratio;
   // Grab the directional data
-  w1 = - throttle * MAX_MOTOR_EFFORT;
-  w2 = - throttle * MAX_MOTOR_EFFORT;
-  w3 = throttle * MAX_MOTOR_EFFORT;
-  w4 = throttle * MAX_MOTOR_EFFORT;
+  w1 = - speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w2 = - speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w3 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w4 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
 
   w.w1 = w1;
   w.w2 = w2;
@@ -81,12 +81,12 @@ bool DrivingTools::CirculateBaseStation(driving_tools::CirculateBaseStation::Req
   s.s3 = s3;
   s.s4 = s4;
 
-  double throttle = req.throttle;
+  double speed_ratio = req.speed_ratio;
   // Grab the directional data
-  w1 = throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
-  w2 = throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
-  w3 = - throttle * MAX_MOTOR_EFFORT * (R-SEMI_CHASSIS_LENGTH)/R;
-  w4 = - throttle * MAX_MOTOR_EFFORT * (R+SEMI_CHASSIS_LENGTH)/R;
+  w1 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS) * (R+SEMI_CHASSIS_LENGTH)/R;
+  w2 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS) * (R-SEMI_CHASSIS_LENGTH)/R;
+  w3 = - speed_ratio * (MAX_SPEED / WHEEL_RADIUS) * (R-SEMI_CHASSIS_LENGTH)/R;
+  w4 = - speed_ratio * (MAX_SPEED / WHEEL_RADIUS) * (R+SEMI_CHASSIS_LENGTH)/R;
 
   w.w1 = w1;
   w.w2 = w2;
@@ -118,12 +118,12 @@ bool DrivingTools::MoveForward(driving_tools::MoveForward::Request  &req, drivin
   s.s3 = s3;
   s.s4 = s4;
 
-  double throttle = req.throttle;
+  double speed_ratio = req.speed_ratio;
   // Grab the directional data
-  w1 = throttle * MAX_MOTOR_EFFORT;
-  w2 = throttle * MAX_MOTOR_EFFORT;
-  w3 = throttle * MAX_MOTOR_EFFORT;
-  w4 = throttle * MAX_MOTOR_EFFORT;
+  w1 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w2 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w3 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w4 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
 
   w.w1 = w1;
   w.w2 = w2;
@@ -182,12 +182,12 @@ bool DrivingTools::MoveSideways(driving_tools::MoveSideways::Request  &req, driv
   s.s3 = s3;
   s.s4 = s4;
 
-  double throttle = req.throttle;
+  double speed_ratio = req.speed_ratio;
   // Grab the directional data
-  w1 = throttle * MAX_MOTOR_EFFORT;
-  w2 = throttle * MAX_MOTOR_EFFORT;
-  w3 = throttle * MAX_MOTOR_EFFORT;
-  w4 = throttle * MAX_MOTOR_EFFORT;
+  w1 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w2 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w3 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
+  w4 = speed_ratio * (MAX_SPEED / WHEEL_RADIUS);
 
   w.w1 = w1;
   w.w2 = w2;
@@ -207,7 +207,7 @@ bool DrivingTools::MoveSideways(driving_tools::MoveSideways::Request  &req, driv
 bool DrivingTools::Stop(driving_tools::Stop::Request  &req, driving_tools::Stop::Response &res)
 {
   driving_mode_ = STOP_MODE;
-  if (req.enableStop)
+  if (req.enable)
   {
     // ROS_INFO("Stop Service requested.");
 

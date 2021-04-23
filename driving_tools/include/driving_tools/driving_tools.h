@@ -33,11 +33,18 @@
 #define PI 3.14159265
 
 /*!
- * \def MAX_MOTOR_EFFORT
+ * \def MAX_SPEED
  *
- * The maximum translational velocity.
+ * The maximum wheel rotational speed.
  */
-#define MAX_MOTOR_EFFORT 75.0
+#define MAX_SPEED 1.07
+
+/*!
+ * \def WHEEL_RADIUS
+ *
+ * The wheel radius.
+ */
+#define WHEEL_RADIUS 0.17
 
 /*!
  * \def MAX_STEERING_ANGLE

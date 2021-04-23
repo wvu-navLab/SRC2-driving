@@ -105,7 +105,7 @@ void FourWheelSteeringDriving::stopping(const ros::Time& time)
 void FourWheelSteeringDriving::brake()
 {
     driving_tools::Stop srv;
-    srv.request.enableStop = true;
+    srv.request.enable = true;
     bool success = clientStop.call(srv);
 }
 
