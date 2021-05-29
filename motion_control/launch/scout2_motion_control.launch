@@ -1,0 +1,31 @@
+<launch>
+  <group ns="small_scout_2">
+    <!-- load the lidar/camera mount joint commander -->
+    <node name="cmd_sensor"
+      pkg="motion_control"
+      type="cmd_sensor"
+      respawn="false"
+      output="screen"/>
+
+    <!-- load the manipulator's joints commander -->
+    <node name="cmd_arm"
+      pkg="motion_control"
+      type="cmd_arm"
+      respawn="false"
+      output="screen"/>
+
+    <!-- load the wheels' motor torques commanders -->
+    <node name="cmd_wheels"
+      pkg="motion_control"
+      type="cmd_wheels"
+      respawn="false"
+      output="screen"/>
+
+    <!-- load the steering arms' joints commanders -->
+    <node name="cmd_steering"
+      pkg="motion_control"
+      type="cmd_steering"
+      respawn="false"
+      output="screen"/>
+  </group>
+</launch>
