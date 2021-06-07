@@ -1,23 +1,14 @@
 <launch>
-  <!-- scout_motion_control launch file -->
-  <include file="$(find motion_control)/launch/scout_motion_control.launch"/>
-
-  <!-- scout_driving_tools launch file -->
-  <include file="$(find driving_tools)/launch/scout_driving_tools.launch"/>
-
-  <group ns="small_scout_1">
   
-    <node pkg="driving_control"
-          name="fws_driving"
-          type="fws_driving"
-          output="screen">
-      <rosparam
-        command="load"
-        file="$(find driving_control)/config/scout_driving_control.yaml"
-        subst_value="true"
-      />
-    </node>
-
-  </group>
+  <node pkg="driving_control"
+        name="fws_driving"
+        type="fws_driving"
+        output="screen">
+    <rosparam
+      command="load"
+      file="$(find driving_control)/config/scout_params.yaml"
+      subst_value="true"
+    />
+  </node>
 
 </launch>

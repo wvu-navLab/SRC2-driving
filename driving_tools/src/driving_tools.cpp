@@ -168,7 +168,7 @@ bool DrivingTools::TurnWheelsSideways(driving_tools::TurnWheelsSideways::Request
 
 bool DrivingTools::MoveSideways(driving_tools::MoveSideways::Request  &req, driving_tools::MoveSideways::Response &res)
 {
-  driving_mode_ = DACK_MODE;
+  driving_mode_ = CRAB_MODE;
 
   // ROS_INFO("Move Forward Service requested.");
   // Rotate wheels at 45 deg

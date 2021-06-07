@@ -1,6 +1,5 @@
-robot_name: "small_scout_2"
 joint_state_controller_publish_rate: 15.0
-max_velocity: 1.07
+max_velocity: 0.53
 wheel_radius: 0.17
 wheel_separation_length: 1.07
 wheel_separation_width: 1.00

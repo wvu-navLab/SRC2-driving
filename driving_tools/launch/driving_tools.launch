@@ -1,11 +1,9 @@
 <launch> 
 
-  <group ns="small_hauler_1">
     <node pkg="driving_tools"
           name="driving_tools"
           type="driving_tools"
           output="screen">
     </node>
-  </group>
 
 </launch>
