@@ -21,7 +21,7 @@ FourWheelSteeringDriving::FourWheelSteeringDriving(ros::NodeHandle & nh)
     , wheel_steering_y_offset_(0.0)
     , wheel_radius_(0.0)
     , wheel_separation_length_(0.0)
-    , cmd_vel_timeout_(1.0)
+    , cmd_vel_timeout_(0.1)
     , enable_twist_cmd_(true)
 {
 
@@ -165,7 +165,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
             double rear_left_steering = 0, rear_right_steering = 0;
             if(enable_twist_cmd_ == true)
             {
-            
+
 
                 bool vx_flag = (fabs(curr_cmd_twist.lin_x) > 0.001);
                 bool vy_flag = (fabs(curr_cmd_twist.lin_y) > 0.001);
@@ -196,7 +196,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
                     front_right_steering = 0;
                     rear_right_steering = 0;
                     front_left_steering = 0;
-                    rear_left_steering = 0;                    
+                    rear_left_steering = 0;
                 }
                 else if (vx_flag && vy_flag && !wz_flag) // All-Wheel Driving (crab motion)
                 {
@@ -270,7 +270,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
             s.s3 = front_left_steering; //fl_steering_joint
             s.s4 = rear_left_steering; //bl_steering_joint
             pubSteeringAngles.publish(s);
-            // ROS_INFO_STREAM("Steering angles commanded" << s);            
+            // ROS_INFO_STREAM("Steering angles commanded" << s);
         }
 
         std_msgs::Int64 mode;
