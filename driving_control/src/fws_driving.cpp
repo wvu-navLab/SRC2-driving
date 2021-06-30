@@ -152,7 +152,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
             curr_cmd_twist.lin_y = 0.0;
             curr_cmd_twist.ang = 0.0;
             active_cmd_vel_ = false;
-            ROS_INFO_STREAM("Active: " << active_cmd_vel_);
+            // ROS_INFO_STREAM("Active: " << active_cmd_vel_);
         }
         else
         {

@@ -147,10 +147,20 @@ bool DrivingTools::TurnWheelsSideways(driving_tools::TurnWheelsSideways::Request
 
   // ROS_INFO("Move Forward Service requested.");
   // Rotate wheels at 45 deg
-  s1 = -MAX_STEERING_ANGLE;
-  s2 = -MAX_STEERING_ANGLE;
-  s3 = -MAX_STEERING_ANGLE;
-  s4 = -MAX_STEERING_ANGLE;
+  if (req.start)
+  {
+    s1 = -MAX_STEERING_ANGLE;
+    s2 = -MAX_STEERING_ANGLE;
+    s3 = -MAX_STEERING_ANGLE;
+    s4 = -MAX_STEERING_ANGLE;
+  }
+  else
+  {
+    s1 = 0;
+    s2 = 0;
+    s3 = 0;
+    s4 = 0;
+  }
 
   s.s1 = s1;
   s.s2 = s2;
