@@ -113,7 +113,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES motion_control
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control 
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control
 #  DEPENDS system_lib
 )
 
@@ -125,7 +125,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include  
+  include
   ~/srcp2-competitors/ros_workspace/install/include
   ${catkin_INCLUDE_DIRS}
 )
@@ -188,9 +188,13 @@ target_link_libraries(driving_tools
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS driving_tools
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
+install(DIRECTORY launch/
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+   PATTERN ".svn" EXCLUDE)
+
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html

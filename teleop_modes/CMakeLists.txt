@@ -108,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES motion_control
-  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control 
+  CATKIN_DEPENDS message_runtime std_msgs geometry_msgs motion_control
 #  DEPENDS system_lib
 )
 
@@ -163,6 +163,12 @@ target_link_libraries(teleop_modes_key
 
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
+install(TARGETS teleop_modes_key
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
+install(DIRECTORY launch/
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+   PATTERN ".svn" EXCLUDE)
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
