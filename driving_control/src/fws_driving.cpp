@@ -213,6 +213,20 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
                     front_left_steering = front_right_steering;
                     rear_left_steering = front_right_steering;
                 }
+                else if (!vx_flag && vy_flag && wz_flag) // All-Wheel Driving (crab motion)
+                {
+                    driving_mode_ = CRAB_MODE;
+                    vel_right_front = std::hypot(curr_cmd_twist.lin_y, 0.03)/ wheel_radius_;
+                    vel_right_rear = vel_right_front;
+                    vel_left_front = vel_right_front;
+                    vel_left_rear = vel_right_front;
+
+                    // const double sign_vy = copysign(1.0, curr_cmd_twist.lin_y);
+                    front_right_steering = atan(curr_cmd_twist.lin_y/ 0.03);
+                    rear_right_steering = front_right_steering;
+                    front_left_steering = front_right_steering;
+                    rear_left_steering = front_right_steering;
+                }
                 else // Double Ackermann Driving
                 {
                     driving_mode_ = DACK_MODE;
