@@ -146,7 +146,7 @@ void FourWheelSteeringDriving::updateCommand(const ros::Time& time, const ros::D
         // Brake if cmd_vel has timeout:
         if (dt > cmd_vel_timeout_)
         {
-            ROS_WARN("Cmd Vel Timeout");
+            // ROS_WARN("Cmd Vel Timeout");
             driving_mode_ = INACTIVE_MODE;
             curr_cmd_twist.lin_x = 0.0;
             curr_cmd_twist.lin_y = 0.0;
